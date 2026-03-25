@@ -39,7 +39,7 @@
 
 # La stratégie de vaccination repose sur 
 # 1- vacciner les cas contact : plus ciblé, moins de vaccins "gaspillés"
-# 2- vacciner tout le monde : enjeu budget, mais prévention efficace
+# 2- vacciner tout le monde : enjeu budget, mais prévention efficace...
 
 
 # # Implémentation
