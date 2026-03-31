@@ -49,12 +49,12 @@
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
 
-import Pkg; Pkg.add("StatsBase")            # messemble il ne doit pas y aboir de pkg.add mais je ne me souviens plus de la bonne manière
+import StatsBase 
 using StatsBase
 
-# Initialisation de nombre aléatoire
-import Random 
-Random.seed!(2045)
+# Initialisation de nombre aléatoire        # on en atu de besoin? je pense pas vu quil faut répliquer 4x la simulation
+# import Random 
+# Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
 import UUIDs
@@ -328,11 +328,11 @@ current_figure()
 
 # Visualisation des infections sur l'axe x
 
-scatter(t, first.(pos), color=:black, alpha=0.5)
+scatter!(t, first.(pos), color=:black, alpha=0.5)
 
 # et y
 
-scatter(t, last.(pos), color=:black, alpha=0.5)
+scatter!(t, last.(pos), color=:black, alpha=0.5)
 
 # Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail
 # final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
@@ -347,21 +347,7 @@ include("code/01_test.jl")
 
 # ## Une autre section
 
-"""
-    foo(x, y)
-
-Cette fonction ne fait rien.
-"""
-function foo(x, y)
-    ## Cette ligne est un commentaire
-    return nothing
-end
-
 # # Présentation des résultats
-
-# La figure suivante représente des valeurs aléatoires:
-
-hist(randn(1000), color=:grey80)
 
 # # Discussion
 
