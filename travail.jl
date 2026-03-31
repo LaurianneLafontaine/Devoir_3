@@ -56,6 +56,7 @@
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
 
+import Pkg; Pkg.add("StatsBase")
 using StatsBase
 
 # Initialisation de nombre aléatoire
@@ -146,11 +147,11 @@ ishealthy(agent::Agent) = !isinfectious(agent)
 
 # Vérifier si un agent est vacciné
 
-isvaccined(agent::Agent = agent.vaccinated)
+# isvaccined(agent::Agent = agent.vaccinated)
 
 # Vérifier si un agent est un attente de l'efficacité du vaccin (C7)
 
-ispending(agent::Agent = agent.vaccin_clock)
+# ispending(agent::Agent = agent.vaccin_clock)
 
 # On peut maintenant définir une fonction pour prendre uniquement les agents qui
 # sont infectieux dans une population. Pour que ce soit clair, nous allons créer
@@ -183,6 +184,9 @@ end
 # # Initialisation de la simulation
 
 # Population initiale:
+function Population(L::Landscape, n::Integer)
+    return rand(Agent, L, n)
+end
 
 population = Population(L, 3750)        # 3750 étant la taille de la population (C2)
 
@@ -375,3 +379,4 @@ hist(randn(1000), color=:grey80)
 # Le format de la bibliographie est American Physics Society, et les références
 # seront correctement présentées dans ce format. Vous ne devez/pouvez pas éditer
 # la bibliographie à la main.
+
