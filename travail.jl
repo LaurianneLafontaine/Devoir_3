@@ -328,11 +328,11 @@ current_figure()
 
 # Visualisation des infections sur l'axe x
 
-scatter!(t, first.(pos), color=:black, alpha=0.5)
+# scatter(t, first.(pos), color=:black, alpha=0.5)
 
 # et y
 
-scatter!(t, last.(pos), color=:black, alpha=0.5)
+# scatter(t, last.(pos), color=:black, alpha=0.5)
 
 # Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail
 # final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
