@@ -30,16 +30,9 @@
 # Celui-ci démarre dans une population complètement saine, après qu'une personne au hasard soit infectée, il
 # possède un probabilité d'infection sur ses voisins de 40% par contact direct. 
 
-# Les individus infectés sont asymptomatique, alors nous pouvons seulement détecté l'infection avec un test de détection antigénique rapide 
-# (RAT). Cependant, les tests de détections ne sont pas parfait et ont un 5% de faux négatifs. En effet, il est commun de ne pas 
-# avoir de tests 100% efficaces (...article)
-
-# Pour la prévention, il y a des vaccins 100% efficaces, seulement après 2 jours. Ce n'est pas très réaliste de la 
-# vraie vie (...article)
-
 # La stratégie de vaccination repose sur 
-# 1- vacciner les cas contact : plus ciblé, moins de vaccins "gaspillés"
-# 2- vacciner tout le monde : enjeu budget, mais prévention efficace...
+# vacciner les cas contact : plus ciblé, moins de vaccins "gaspillés"
+# ex. covid avec gens à risque en premier...
 
 
 # # Implémentation
@@ -56,7 +49,7 @@
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
 
-import Pkg; Pkg.add("StatsBase")
+import Pkg; Pkg.add("StatsBase")            # messemble il ne doit pas y aboir de pkg.add mais je ne me souviens plus de la bonne manière
 using StatsBase
 
 # Initialisation de nombre aléatoire
@@ -78,7 +71,7 @@ Base.@kwdef mutable struct Agent        # création de valeurs par défaut pouva
     y::Int64 = 0
     clock::Int64 = 21                   # nombre de jours avant la mort si infecté (C4)
     infectious::Bool = false            # agent sein par défaut
-    vaccinated::Bool = false            # savoir si agent immunisé par vaccin (C6)
+    # vaccinated::Bool = false            # savoir si agent immunisé par vaccin (C6)
     id::UUIDs.UUID = UUIDs.uuid4()      # identifiant unique généré automatiquement
 end
 
@@ -183,12 +176,13 @@ end
 
 # # Initialisation de la simulation
 
-# Population initiale:
+# Population initiale :
+
 function Population(L::Landscape, n::Integer)
     return rand(Agent, L, n)
 end
 
-population = Population(L, 3750)        # 3750 étant la taille de la population (C2)
+population = Population(L, 3750) ;       # 3750 étant la taille de la population (C2)
 
 # Choisir au hasard dans la population un infecté (cas index) C5 :
 
@@ -370,6 +364,43 @@ end
 hist(randn(1000), color=:grey80)
 
 # # Discussion
+
+# revenir sur éléments de l'intro
+# stratégie de vaccination : en effet, efficacité... cohérent avec littérature
+# discuter des résultats
+
+# durée totale de l'épidémie, nombre infections, taille pop début vs fin, budget fin. comparer avec sans campagne de vaccination/dépistage?
+# modèle stochastique reflète réalité biologique lors de vraie épidémie = vrai hasard cas propagation
+
+# limites : 
+# Les individus infectés sont asymptomatique, alors nous pouvons seulement détecté l'infection avec un test de détection antigénique rapide 
+# (RAT). Cependant, les tests de détections ne sont pas parfait et ont un 5% de faux négatifs. En effet, il est commun de ne pas 
+# avoir de tests 100% efficaces (...article)
+
+# Pour la prévention, il y a des vaccins 100% efficaces, seulement après 2 jours. Ce n'est pas très réaliste de la 
+# vraie vie (...article)
+
+# zones géographiques denses vs non (peu d'agents), 
+
+# réplication : durée, infection (moyenne et écart type)
+# plusieurs schénarios possibles donc intéressant car vs grosse explosion vs lente
+# une personne sur 3750 infecté sur une grille de 10000 cases = peu de prob et plusieurs générations peuvent se passer
+
+# modélisé comme binaire : infecté ou non (pas durée et intensité)
+# pas hétérogénéité de contact : ici juste contact vs zone, goutelettes...
+
+# modèle fatale... médecine d'aujourdhui pas vraiment le cas, rare fatale, science progresse
+
+# structure de la population : age, sexe, susceptibilité, comportement adaptatif (siolement volontaire)
+
+# simplification avec déplacement aléatoire sur grille vide (maison, lieu travail, hopital)
+
+# "timing" plus commence tôt...
+
+
+
+
+
 
 # On peut aussi citer des références dans le document `references.bib`, qui doit
 # être au format BibTeX. Les références peuvent être citées dans le texte avec
