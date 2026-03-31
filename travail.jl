@@ -312,17 +312,17 @@ f
 # l'épidémie. Pour ceci, nous allons extraire l'information sur le temps et la
 # position de chaque infection:
 
+if length(events) > 0
  t = [event.time for event in events];
  pos = [(event.x, event.y) for event in events];
-
-#
-
-f = Figure()
-ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
-hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
-Colorbar(f[1, 2], hm, label="Time of infection")
-hidedecorations!(ax)
-current_figure()
+ 
+ f = Figure()
+ ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
+ hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
+ Colorbar(f[1, 2], hm, label="Time of infection")
+ hidedecorations!(ax)
+ current_figure()
+end 
 
 # # Figures supplémentaires
 
