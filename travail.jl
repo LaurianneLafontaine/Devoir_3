@@ -33,27 +33,54 @@
 # qui est initialement saine. La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et une mortalité complète en absence d'ntervention.
 # Un vaccin entièrement efficace est disponible, mais il y a un délai de deux générations après son administration avant que l'immunité ne soit acquise.
 # De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les ressources peuvent être allouées soit au dépistage par
-# des tests antigéniques rapides, soit à la vaccination des individus.
+# des tests antigéniques rapides, soit à la vaccination des individu.
 
 # L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
 # respectant les contraintes biologiques et budgétaires imposées par le modèle. 
 
 # # Présentation du modèle
 
-# Dans cette simulation, nous avons un virus causant la mort après 3 semaines (...ebola littérature)
-# Celui-ci démarre dans une population complètement saine, après qu'une personne au hasard soit infectée, il
-# possède un probabilité d'infection sur ses voisins de 40% par contact direct. 
+# Dans cette simulation, nous avons un virus causant la mort après trois semaines d'infection (21 jours), comme observé pour certaines maladie infectieuses très virulentes
+# (par exemple, Ebola). La population initiale est complètement saine, et un individu est choisi au hasard pour être infecté au début de la simulation.
+# Chaque agent infectieux a une probabilité de transmission de 40% à ses voisins dans la même cellule, ce qui représente un contact direct.
 
-# La stratégie de vaccination repose sur 
-# vacciner les cas contact : plus ciblé, moins de vaccins "gaspillés"
-# ex. covid avec gens à risque en premier...
+# Les individus infectés sont asymptomatiques, ce qui signifie que l'infection ne peut être détectée qu'à l'aide d'un test antigénique rapide (RAT).
+# Ce test présente une précision de 95%, ce qui implique un taux de faux négatifs de 5%. Cette incertitude reflète le fait qu'en réalité, les tests diagnostiques
+# ne sont jamais parfaits et que la prévalence réelle de la maladie reste inconnue sans un dépistage systématique.
 
+# Pour prévenir la propagation de l'infection, un vaccin entièrement efficace est disponible. Cependant, son effet protecteur n'apparaît que deux générations après
+# son administration, ce qui correspond à un délai biologique pour le développement de l'immunité. La vaccination protège donc contre l'infection, mais aussi la mortalité
+# et empêche aussi toute réinfection.
+
+# La simulation intègre des contraintes budgétaires strictes: (1) Chaque dose de vaccin coûte 17$; (2) Chaque test RAT coûte 4$; (3) Le budget total disponible est de 21 000$.
+# La stratégie de vaccination doit donc être conçue en tenant compte de la limite financière, en répartissant les ressources entre dépistage et vaccination.
+
+# La simulation prend en compte que l'intervention, donc les tests et vaccinations, ne peut commencer qu'après le décès du premier individu, reflétant ainsi le fait que la
+# détection initiale et l'intervention des autorités peuvent être retardées dans une épidémie réelle.
 
 # # Implémentation
 
-# Dans le code, il y a le cycle du virus avec la transmission, cycle de vie et le côté santé publique.
+# 1. Durée et suivi de la maladie: Chaque agent infectieux reste malade pendant 21 jours avant de mourir si aucune intervention n'est appliquée.
+# La durée de la maladie est suivie dans le modèle par le compteur `clock` de chaque agent. Le décès survient automatiquement lorsque le compteur atteint zéro.
 
-# Budjet
+# 2. Déclenchement: Campagne commence après le décès du premier cas.
+
+# 3. Détection des individus infectieux (test RAT): On teste les agents choisis au hasard dans la population saine pour identifier les infectés.
+#Les tests coûtent 4$ chacun et détectent 95% des infectés.
+
+# 4. Vaccination: Tous les individus sains détectés après test RAT sont vaccinés. Chaque vaccin coûte 17$ et devient actif après 2 générations. 
+# Les agents vaccinés sont marqués dans le modèle (vaccinated=true) et le compteur vaccine_timer suit le délai jusqu'à l'immunité.
+# On continue jusqu'à épuisement du budget (tests RAT + vaccins)
+
+# 5. Budget: 21 000$ pour l'ensemble de la campagne. Le code vérifie à chaque test ou vaccinaition que le budget restant est suffisant.
+# Chaque test ou vaccination réduit le budget disponible. Quand le budget est épuisé, on arrête les tests et les vaccinations
+# mais la simulation continue jusqu'à extinction de l'épidémie.
+
+# 6. Règles de propagation: Individus infectieux sont asymptomatiques et peuvent infecter les voisins avec une probabilité de 40%. Le modèle suit le temps de maladie (clock).
+# L'infection ne peut pas survenir chez un agent vacciné après l'activation du vaccin.
+
+# 7. Mise à jour des agents: À chaque génération, les états des agents sont mis à jour: `infectious` pour les agents infectés, `vaccinated` pour les agents vaccinés 
+# `vaccine_timer` pour déclencher l'effet du vaccin après 2 générations, et `clock` pour suivre la durée de la maladie et déclencher le décès au bon moment.
 
 # # Code pour le modèle
 
