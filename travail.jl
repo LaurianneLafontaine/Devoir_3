@@ -24,6 +24,20 @@
 # En prévention, il y a la vaccination qui permet de se protéger en s'immunisant contre le virus et les tests de détection pour 
 # protéger les autres.
 
+# Dans certaines situations épidémiologiques, les individus infectés peuvent demeurer asympotomatiques tout en étant capables de transmettre la maladie.
+# Dans ces conditions, l'identification des personnes infectieuses dépend de l'utilisation de tests diagnostiques qui ne sont pas toujours fiables.
+# Cette incertitude représente un défi important pour la mise en place d'interventions de santé publique efficaces, puisque la prévalence réelle de la
+# maladie ne peut être estimée qu'à partir des résultats de dépistage.
+
+# Pour étudier ces enjeux, nous utilisons un modèle de simulation agent basé qui représente la propagation d'une maladie infectieuse dans une population
+# qui est initialement saine. La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et une mortalité complète en absence d'ntervention.
+# Un vaccin entièrement efficace est disponible, mais il y a un délai de deux générations après son administration avant que l'immunité ne soit acquise.
+# De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les ressources peuvent être allouées soit au dépistage par
+# des tests antigéniques rapides, soit à la vaccination des individus.
+
+# L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
+# respectant les contraintes biologiques et budgétaires imposées par le modèle. 
+
 # # Présentation du modèle
 
 # Dans cette simulation, nous avons un virus causant la mort après 3 semaines (...ebola littérature)
