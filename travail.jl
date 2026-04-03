@@ -90,11 +90,12 @@
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
 
+import StatsBase 
 using StatsBase
 
-# Initialisation de nombre aléatoire
-import Random 
-Random.seed!(2045)
+# Initialisation de nombre aléatoire        # on en atu de besoin? je pense pas vu quil faut répliquer 4x la simulation
+# import Random 
+# Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
 import UUIDs
@@ -111,7 +112,7 @@ Base.@kwdef mutable struct Agent        # création de valeurs par défaut pouva
     y::Int64 = 0
     clock::Int64 = 21                   # nombre de jours avant la mort si infecté (C4)
     infectious::Bool = false            # agent sein par défaut
-    vaccinated::Bool = false            # savoir si agent immunisé par vaccin (C6)
+    # vaccinated::Bool = false            # savoir si agent immunisé par vaccin (C6)
     id::UUIDs.UUID = UUIDs.uuid4()      # identifiant unique généré automatiquement
 end
 
@@ -180,11 +181,11 @@ ishealthy(agent::Agent) = !isinfectious(agent)
 
 # Vérifier si un agent est vacciné
 
-isvaccined(agent::Agent = agent.vaccinated)
+# isvaccined(agent::Agent = agent.vaccinated)
 
 # Vérifier si un agent est un attente de l'efficacité du vaccin (C7)
 
-ispending(agent::Agent = agent.vaccin_clock)
+# ispending(agent::Agent = agent.vaccin_clock)
 
 # On peut maintenant définir une fonction pour prendre uniquement les agents qui
 # sont infectieux dans une population. Pour que ce soit clair, nous allons créer
@@ -216,9 +217,13 @@ end
 
 # # Initialisation de la simulation
 
-# Population initiale:
+# Population initiale :
 
-population = Population(L, 3750)        # 3750 étant la taille de la population (C2)
+function Population(L::Landscape, n::Integer)
+    return rand(Agent, L, n)
+end
+
+population = Population(L, 3750) ;       # 3750 étant la taille de la population (C2)
 
 # Choisir au hasard dans la population un infecté (cas index) C5 :
 
@@ -348,58 +353,79 @@ f
 # l'épidémie. Pour ceci, nous allons extraire l'information sur le temps et la
 # position de chaque infection:
 
-t = [event.time for event in events];
-pos = [(event.x, event.y) for event in events];
-
-#
-
-f = Figure()
-ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
-hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
-Colorbar(f[1, 2], hm, label="Time of infection")
-hidedecorations!(ax)
-current_figure()
+if length(events) > 0
+ t = [event.time for event in events];
+ pos = [(event.x, event.y) for event in events];
+ 
+ f = Figure()
+ ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
+ hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
+ Colorbar(f[1, 2], hm, label="Time of infection")
+ hidedecorations!(ax)
+ current_figure()
+end 
 
 # # Figures supplémentaires
 
 # Visualisation des infections sur l'axe x
 
-scatter(t, first.(pos), color=:black, alpha=0.5)
+ scatter(t, first.(pos), color=:black, alpha=0.5)
 
 # et y
 
-scatter(t, last.(pos), color=:black, alpha=0.5)
+ scatter(t, last.(pos), color=:black, alpha=0.5)
 
-# Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail
-# final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
+# Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
 # modèle hors du document principal.
 
 # Le contenu des fichiers est inclus avec `include("code/nom_fichier.jl")`.
 
-# Attention! Il faut que le code soit inclus au bon endroit (avant que les
-# fonctions déclarées soient appellées).
+# Attention! Il faut que le code soit inclus au bon endroit (avant que les fonctions déclarées soient appellées).
 
 include("code/01_test.jl")
 
 # ## Une autre section
 
-"""
-    foo(x, y)
-
-Cette fonction ne fait rien.
-"""
-function foo(x, y)
-    ## Cette ligne est un commentaire
-    return nothing
-end
-
 # # Présentation des résultats
 
-# La figure suivante représente des valeurs aléatoires:
-
-hist(randn(1000), color=:grey80)
-
 # # Discussion
+
+# revenir sur éléments de l'intro
+# stratégie de vaccination : en effet, efficacité... cohérent avec littérature
+# discuter des résultats
+
+# durée totale de l'épidémie, nombre infections, taille pop début vs fin, budget fin. comparer avec sans campagne de vaccination/dépistage?
+# modèle stochastique reflète réalité biologique lors de vraie épidémie = vrai hasard cas propagation
+
+# limites : 
+# Les individus infectés sont asymptomatique, alors nous pouvons seulement détecté l'infection avec un test de détection antigénique rapide 
+# (RAT). Cependant, les tests de détections ne sont pas parfait et ont un 5% de faux négatifs. En effet, il est commun de ne pas 
+# avoir de tests 100% efficaces (...article)
+
+# Pour la prévention, il y a des vaccins 100% efficaces, seulement après 2 jours. Ce n'est pas très réaliste de la 
+# vraie vie (...article)
+
+# zones géographiques denses vs non (peu d'agents), 
+
+# réplication : durée, infection (moyenne et écart type)
+# plusieurs schénarios possibles donc intéressant car vs grosse explosion vs lente
+# une personne sur 3750 infecté sur une grille de 10000 cases = peu de prob et plusieurs générations peuvent se passer
+
+# modélisé comme binaire : infecté ou non (pas durée et intensité)
+# pas hétérogénéité de contact : ici juste contact vs zone, goutelettes...
+
+# modèle fatale... médecine d'aujourdhui pas vraiment le cas, rare fatale, science progresse
+
+# structure de la population : age, sexe, susceptibilité, comportement adaptatif (siolement volontaire)
+
+# simplification avec déplacement aléatoire sur grille vide (maison, lieu travail, hopital)
+
+# "timing" plus commence tôt...
+
+
+
+
+
 
 # On peut aussi citer des références dans le document `references.bib`, qui doit
 # être au format BibTeX. Les références peuvent être citées dans le texte avec
@@ -409,3 +435,4 @@ hist(randn(1000), color=:grey80)
 # Le format de la bibliographie est American Physics Society, et les références
 # seront correctement présentées dans ce format. Vous ne devez/pouvez pas éditer
 # la bibliographie à la main.
+
