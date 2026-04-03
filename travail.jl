@@ -33,7 +33,7 @@
 # qui est initialement saine. La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et une mortalité complète en absence d'ntervention.
 # Un vaccin entièrement efficace est disponible, mais il y a un délai de deux générations après son administration avant que l'immunité ne soit acquise.
 # De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les ressources peuvent être allouées soit au dépistage par
-# des tests antigéniques rapides, soit à la vaccination des individus.
+# des tests antigéniques rapides, soit à la vaccination des individu.
 
 # L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
 # respectant les contraintes biologiques et budgétaires imposées par le modèle. 
