@@ -40,7 +40,7 @@
 
 # # Présentation du modèle
 
-# Dans cette simulation, nous avons un virus causant la mort après trois semaines d'infection, comme observé pour certaines maladie infectieuses très virulentes
+# Dans cette simulation, nous avons un virus causant la mort après trois semaines d'infection (21 jours), comme observé pour certaines maladie infectieuses très virulentes
 # (par exemple, Ebola). La population initiale est complètement saine, et un individu est choisi au hasard pour être infecté au début de la simulation.
 # Chaque agent infectieux a une probabilité de transmission de 40% à ses voisins dans la même cellule, ce qui représente un contact direct.
 
@@ -60,11 +60,27 @@
 
 # # Implémentation
 
+# 1. Durée et suivi de la maladie: Chaque agent infectieux reste malade pendant 21 jours avant de mourir si aucune intervention n'est appliquée.
+# La durée de la maladie est suivie dans le modèle par le compteur `clock` de chaque agent. Le décès survient automatiquement lorsque le compteur atteint zéro.
 
+# 2. Déclenchement: Campagne commence après le décès du premier cas.
 
-# Dans le code, il y a le cycle du virus avec la transmission, cycle de vie et le côté santé publique.
+# 3. Détection des individus infectieux (test RAT): On teste les agents choisis au hasard dans la population saine pour identifier les infectés.
+#Les tests coûtent 4$ chacun et détectent 95% des infectés.
 
-# Budjet
+# 4. Vaccination: Tous les individus sains détectés après test RAT sont vaccinés. Chaque vaccin coûte 17$ et devient actif après 2 générations. 
+# Les agents vaccinés sont marqués dans le modèle (vaccinated=true) et le compteur vaccine_timer suit le délai jusqu'à l'immunité.
+# On continue jusqu'à épuisement du budget (tests RAT + vaccins)
+
+# 5. Budget: 21 000$ pour l'ensemble de la campagne. Le code vérifie à chaque test ou vaccinaition que le budget restant est suffisant.
+# Chaque test ou vaccination réduit le budget disponible. Quand le budget est épuisé, on arrête les tests et les vaccinations
+# mais la simulation continue jusqu'à extinction de l'épidémie.
+
+# 6. Règles de propagation: Individus infectieux sont asymptomatiques et peuvent infecter les voisins avec une probabilité de 40%. Le modèle suit le temps de maladie (clock).
+# L'infection ne peut pas survenir chez un agent vacciné après l'activation du vaccin.
+
+# 7. Mise à jour des agents: À chaque génération, les états des agents sont mis à jour: `infectious` pour les agents infectés, `vaccinated` pour les agents vaccinés 
+# `vaccine_timer` pour déclencher l'effet du vaccin après 2 générations, et `clock` pour suivre la durée de la maladie et déclencher le décès au bon moment.
 
 # # Code pour le modèle
 
