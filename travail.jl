@@ -40,21 +40,23 @@
 
 # # Présentation du modèle
 
-# Dans cette simulation, nous avons un virus causant la mort après 3 semaines (...ebola littérature)
-# Celui-ci démarre dans une population complètement saine, après qu'une personne au hasard soit infectée, il
-# possède un probabilité d'infection sur ses voisins de 40% par contact direct. 
+# Dans cette simulation, nous avons un virus causant la mort après trois semaines d'infection, comme observé pour certaines maladie infectieuses très virulentes
+# (par exemple, Ebola). La population initiale est complètement saine, et un individu est choisi au hasard pour être infecté au début de la simulation.
+# Chaque agent infectieux a une probabilité de transmission de 40% à ses voisins dans la même cellule, ce qui représente un contact direct.
 
-# Les individus infectés sont asymptomatique, alors nous pouvons seulement détecté l'infection avec un test de détection antigénique rapide 
-# (RAT). Cependant, les tests de détections ne sont pas parfait et ont un 5% de faux négatifs. En effet, il est commun de ne pas 
-# avoir de tests 100% efficaces (...article)
+# Les individus infectés sont asymptomatiques, ce qui signifie que l'infection ne peut être détectée qu'à l'aide d'un test antigénique rapide (RAT).
+# Ce test présente une précision de 95%, ce qui implique un taux de faux négatifs de 5%. Cette incertitude reflète le fait qu'en réalité, les tests diagnostiques
+# ne sont jamais parfaits et que la prévalence réelle de la maladie reste inconnue sans un dépistage systématique.
 
-# Pour la prévention, il y a des vaccins 100% efficaces, seulement après 2 jours. Ce n'est pas très réaliste de la 
-# vraie vie (...article)
+# Pour prévenir la propagation de l'infection, un vaccin entièrement efficace est disponible. Cependant, son effet protecteur n'apparaît que deux générations après
+# son administration, ce qui correspond à un délai biologique pour le développement de l'immunité. La vaccination protège donc contre l'infection, mais aussi la mortalité
+# et empêche aussi toute réinfection.
 
-# La stratégie de vaccination repose sur 
-# 1- vacciner les cas contact : plus ciblé, moins de vaccins "gaspillés"
-# 2- vacciner tout le monde : enjeu budget, mais prévention efficace...
+# La simulation intègre des contraintes budgétaires strictes: (1) Chaque dose de vaccin coûte 17$; (2) Chaque test RAT coûte 4$; (3) Le budget total disponible est de 21 000$.
+# La stratégie de vaccination doit donc être conçue en tenant compte de la limite financière, en répartissant les ressources entre dépistage et vaccination.
 
+# La simulation prend en compte que l'intervention, donc les tests et vaccinations, ne peut commencer qu'après le décès du premier individu, reflétant ainsi le fait que la
+# détection initiale et l'intervention des autorités peuvent être retardées dans une épidémie réelle.
 
 # # Implémentation
 
