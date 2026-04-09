@@ -460,7 +460,7 @@ pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clini
 function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)
 
     ##  vérifie que le budget restant est suffisant pour effectuer les tests des rdv de la journée 
-    while budget_restant > 0
+    if budget_restant > 0
         untest = untested(population) ## Objet contenant les agents qui n'ont pas encore été testés ( qui n'ont pas eu de RDV )
         num_to_test = min(length(untest), round(Int, pourcent * length(untest)))
         ## Fait un objet contentant les rdv de la journée, qui sont un échantillon de 1% de la population qui n'ont jamais été testés. 
@@ -570,7 +570,7 @@ events = InfectionEvent[]
 while (length(infectious(population)) != 0) & (tick < maxlength)
 
     ## On spécifie que nous utilisons les variables définies plus haut
-    global tick, population
+    global tick, population, budget_restant
 
     tick += 1 # changement dans les décompte de 1 jours à chaques itération
 
