@@ -58,6 +58,11 @@
 # La simulation prend en compte que l'intervention, donc les tests et vaccinations, ne peut commencer qu'après le décès du premier individu, reflétant ainsi le fait que la
 # détection initiale et l'intervention des autorités peuvent être retardées dans une épidémie réelle.
 
+
+# A AJOUTER : DEPLACEMENT DES INDIVIDUS, STRATEGIE DE VACCINATION (IMPOTANT), ISOLATION DES MALADES VACCINE
+#TEST ALEATOIRE CAR ASYMPTOMATIQUE, LATTICE TORUS, QUARENTAINE, ON ARRETE LES RDV QD IL N'AS PLUS DE BUDGET 
+# MAXIMUM DE 1% PAR JOUR CAR IL Y A DES CONTRAINTES LOGISTIQUE POUR ACCEUILLIR LES AGENTS EN CLINIQUE 
+
 # # Implémentation
 
 # 1. Durée et suivi de la maladie: Chaque agent infectieux reste malade pendant 21 jours avant de mourir si aucune intervention n'est appliquée.
@@ -68,7 +73,7 @@
 # 3. Détection des individus infectieux (test RAT): On teste les agents choisis au hasard dans la population saine pour identifier les infectés.
 #Les tests coûtent 4$ chacun et détectent 95% des infectés.
 
-# 4. Vaccination: Tous les individus sains détectés après test RAT sont vaccinés. Chaque vaccin coûte 17$ et devient actif après 2 générations. 
+# 4. Vaccination: Tous les individus sains détectés après test RAT sont vaccinés. Chaque vaccin coûte 17$ et devient actif après 2 jours . 
 # Les agents vaccinés sont marqués dans le modèle (vaccinated=true) et le compteur vaccine_timer suit le délai jusqu'à l'immunité.
 # On continue jusqu'à épuisement du budget (tests RAT + vaccins)
 
@@ -89,13 +94,13 @@
 # Pour les graphiques
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
-
 import StatsBase 
 using StatsBase
+using Random 
 
-# Initialisation de nombre aléatoire        # on en atu de besoin? je pense pas vu quil faut répliquer 4x la simulation
-# import Random 
-# Random.seed!(2045)
+# Initialisation de nombre aléatoire       
+import Random 
+Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
 import UUIDs
@@ -104,21 +109,27 @@ UUIDs.uuid4()
 # ## Création des types
 
 # Type d'agents
-# Les agents se déplacent sur une lattice, et on doit donc suivre leur position. On doit
-# savoir si ils sont infectieux, et dans ce cas, combien de jours il leur reste:
+# Les agents se déplacent dans un environnement en deux dimension représenté par une lattice, 
+# et on doit donc suivre leur position et leur état : 
+# soit si ils sont vaccinés, et si l'effet protecteur du vaccin est effectif ( soit 2 jours après l'injection)
+# et si ils sont infectieux, et dans ce cas, combien de jours il leur reste.
 
-Base.@kwdef mutable struct Agent        # création de valeurs par défaut pouvant changer pendant la simulation
+Base.@kwdef mutable struct Agent        ## création de valeurs par défaut pouvant changer pendant la simulation
     x::Int64 = 0
     y::Int64 = 0
-    clock::Int64 = 21                   # nombre de jours avant la mort si infecté (C4)
-    infectious::Bool = false            # agent sein par défaut
-    # vaccinated::Bool = false            # savoir si agent immunisé par vaccin (C6)
-    id::UUIDs.UUID = UUIDs.uuid4()      # identifiant unique généré automatiquement
+    clock::Int64 = 21                   ## nombre de jours avant la mort si infecté (C4)
+    infectious::Bool = false            ## Savoir si agent est infectueux 
+    vaccin_clock:: Int64 = 2                    ## Nombre de jour avant l'immunité une fois le vaccin administé
+    vaccinated::Bool = false            ## savoir si agent immunisé par vaccin (C6)
+    id::UUIDs.UUID = UUIDs.uuid4()      ## identifiant unique généré automatiquement
+    tested::Bool = false                ## Savoir si agent est testé 
+    pending::Bool = false               ## Savoir si l'agent est en attente de l'efficacité du vaccin, et en isolation
 end
 
 # Type paysage
 # Définit les limites de la grille où les agents se déplacent
 # Ici, c'est une grille de -50 à 50 dans les deux directions, donc 100x100 = 10 000 cases au total (C1)
+# Les agents se trouvant dans la même cases sont considérés très proches, donc en contact direct 
 
 Base.@kwdef mutable struct Landscape
     xmin::Int64 = -25
@@ -134,24 +145,56 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 # ## Création de nouvelles fonctions
 
 # Création d'agents aléatoires
+# On va commencer par générer une fonction pour créer des agents au hasard. Il
+# existe une fonction pour faire ceci dans _Julia_: `rand`. Pour que notre code
+# soit facile a comprendre, nous allons donc ajouter une méthode à cette
+# fonction:
 
-# Il existe une fonction pour faire ceci dans _Julia_: `rand`. Pour que notre code
-# soit facile a comprendre, nous allons donc ajouter une méthode à cette fonction:
+"""
+    Random.rand(arg1, arg2, arg3)
 
+ Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
+
+ # Arguments 
+ arg1 = Le type d'agent généré
+ arg 2: paysage ou les agent sont généré,  qui se trouve dans la lattice L 
+ arg 3 : ( facultatif ) nombre d'agents généré
+
+ # Retour
+ La fonction retourne un agent ou un tableau d'agent, selon l'argument 3
+
+ # Exemple 
+ Cette fonction nous permet donc de générer un nouvel agent dans un paysage:
+
+ rand(Agent, L)
+
+ Mais aussi de générer plusieurs agents:
+
+ rand(Agent, L, 3)
+
+"""
 Random.rand(::Type{Agent}, L::Landscape) = Agent(x=rand(L.xmin:L.xmax), y=rand(L.ymin:L.ymax))
 Random.rand(::Type{Agent}, L::Landscape, n::Int64) = [rand(Agent, L) for _ in 1:n]
 
-# Cette fonction nous permet donc de générer un nouvel agent dans un paysage:
-
-# rand(Agent, L)
-
-# Mais aussi de générer plusieurs agents:
-
-# rand(Agent, L, 3)
-
 # Fonction du déplacement des agents dans le paysage
 # Puisque la position de l'agent va changer, notre fonction se termine par `!`:
+# La lattice est  de type torus. Ainsi, si un agent atteint la limite de la lattice, elle réapparait de l'autre côté
+# Les déplacements sont aléatoires et peuvent être de -1, 0 ou 1 sur l'axe des x entraîne Y  
+"""
+    move!(arg1, arg2, arg3)
 
+  Permet le déplacement des aléatoire des agents sur la lattice dans les cases adjacentes 
+  chaques jours, ou rester sur place.
+
+ # Arguments 
+ arg1 = L'agent qui se déplace
+ arg 2: paysage ou les agents se déplacent
+ arg 3 : Si la lattice est torridale ou pas ( TRUE or FALSE)
+
+ # Retour
+ La fonction retourne l'agent A, avec sa nouvelle position 
+
+"""
 function move!(A::Agent, L::Landscape; torus=true)
     A.x += rand(-1:1)
     A.y += rand(-1:1)
@@ -173,57 +216,287 @@ end
 
 # Vérifier si un agent est infectieux
 
+"""
+ isinfectious(arg1)
+
+ Vérifie si L'agent est infecté 
+
+ # Arguments 
+ arg1 = un agent
+
+ # Retour
+ True si infecté 
+
+"""
+
 isinfectious(agent::Agent) = agent.infectious
 
 # Vérifier si un agent est sain
+"""
+ ishealthy(arg1)
 
+ Vérifie si L'agent est sain
+
+ # Arguments 
+ arg1 =  un agent
+
+ # Retour
+ True si sain
+ 
+ """
 ishealthy(agent::Agent) = !isinfectious(agent)
 
 # Vérifier si un agent est vacciné
 
-# isvaccined(agent::Agent = agent.vaccinated)
+"""
+ isvaccinated(arg1)
 
-# Vérifier si un agent est un attente de l'efficacité du vaccin (C7)
+ Vérifie si L'agent est vacciné
 
-# ispending(agent::Agent = agent.vaccin_clock)
+ # Arguments 
+ arg1 = un agent
+
+ # Retour
+ True si vacciné
+ """
+isvaccinated(agent::Agent) = agent.vaccinated
+
+vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop)
+
+
+# Vérifier si un agent est testé
+"""
+ istested(arg1)
+
+ Vérifie si L'agent est testé
+
+ # Arguments 
+ arg1 = un agent
+
+ # Retour
+ True si testé
+ """
+istested(agent::Agent) = agent.tested
+
+untested(pop::Vector{Agent}) = filter(!istested, pop)
+tested(pop::Vector{Agent}) = filter(istested, pop)
+
+# Vérifier si un agent est un attente de l'efficacité du vaccin 
+# Après avoir été en contact avec le pathogène dans le vaccin, le corps prend un délais de 2 jours pour développer l'immunnité
+
+"""
+ ispending(arg1)
+
+ Vérifie si L'agent est vacciné mais il n'as pas encore l'immunité, car la période de 2 jours n'est pas passée. 
+ Cela correspond également à la période d'isolation des agents infectueux qui viennent d'être vaccinés. 
+
+ # Arguments 
+ arg1 = un agent
+
+ # Retour
+ True si vacciné mais pas encore efficace
+ """
+ispending(agent::Agent)= agent.vaccin_clock
+
 
 # On peut maintenant définir une fonction pour prendre uniquement les agents qui
 # sont infectieux dans une population. Pour que ce soit clair, nous allons créer
 # un _alias_, `Population`, qui voudra dire `Vector{Agent}`:
 
 const Population = Vector{Agent}
-infectious(pop::Population) = filter(isinfectious, pop)     # retourne les agents malades
-healthy(pop::Population) = filter(ishealthy, pop)           # retourne les agents sains
+
+# retourne les agents malades
+
+"""
+ infectious(arg1)
+
+ Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu infectueux
+
+ # Arguments 
+ arg1 = la population
+
+ # Retour
+ Tout les individus infectueux
+ """
+infectious(pop::Population) = filter(isinfectious, pop)     
+
+# Retourne les agents sains 
+
+"""
+ Healthy(arg1)
+
+ Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu sains
+
+ # Arguments 
+ arg1 = la population
+
+ # Retour
+ Tout les individus sains
+ """
+healthy(pop::Population) = filter(ishealthy, pop)          
+
+# Retourne les agents non testés, qui seront ceux qui ont des RDV à la clinique 
+"""
+ untested(arg1)
+
+ Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu non-testés
+
+ # Arguments 
+ arg1 = la population
+
+ # Retour
+ Tout les individus non testés
+ """
+untested(pop::Population) = filter(!istested, pop)  
+
 
 # Nous allons enfin écrire une fonction pour trouver l'ensemble des agents d'une
 # population qui sont dans la même cellule qu'un agent: retourne les agents qui ont exactement
 # les mêmes coordonées que l'agent cible (contatcs potentiels)
+# Cela peut permet d'intégré la propagation spatiale de la pandémie en fonciton des contacts directes entre individus, qui sont dans la même case de la lattice
 
+"""
+ incell(arg1, arg2 )
+
+ identifie tout les agents d'une populaiton qui sont en contact directs, avec un agent 
+ Ils ont en fait les même coordonnés sur la lattice 
+
+ # Arguments 
+ arg1 = l'agent dont l'ont veut connaitre les contacts directs
+ arg 2 = la population 
+
+ # Retour
+ Tout les agents de la population qui sont dans la même case qu'un agent 
+ 
+ """
 incell(target::Agent, pop::Population) = filter(ag -> (ag.x, ag.y) == (target.x, target.y), pop)
+
 
 # ## Gestion vaccins
 
-# Lorsque l'on administre un vaccin, il y a un temps avant que celui-ci devienne efficace.
-# Ici, c'est 2 jours (C7)
 
+
+# Lorsque l'on administre un vaccin, il y a un délais de 2 jours avant que celui-ci devienne efficace.
+
+"""
+ administrer_vaccin!(arg1)
+
+ Initie un compte à rebourd de 2 jours ( 2 générations ) lorsqu'un agent devient vacciné ( changement de statut)
+
+ # Arguments 
+ arg1 = un agent 
+
+ # Retour
+ L'agent obtient le statut de "ispending" et un compte a rebour de 2 jours avant l'immunité est débuté
+ 
+ """
 function administrer_vaccin!(agent::Agent)
     agent.vaccin_clock = 2
     return agent
-end 
+end
 
-# ## Gestion budget
+# Fonction qui simule les visites à la clinique selon la stratégie de gestion que nous avons adopté 
+# Notre stratégie de gestion permet à 1% de la population d'obtenir un rdv en clinique chaques jours, dans le groupe de la population qui n'as pas été testé 
+# Lors du rendez-vous, on effectue d'abord un test RAP pour déterminée si la personne est saine ou infecté. 
+# La simulation prévoit un taux de faux positif de 5% lors des test RAP
+# Si la personne est infecté, on lui administre le vaccin directement et la place en isolation pendant 2 jours 
 
-# ## Paramètres initiaux
+# Contraines budégtaires 
+# Lorsque le budget est dépassé, on ne peut plus tester ou vacciner les agens qui sont présentement dans leur visite à la clinique
+# Le budget est vérifier avant les tests et avant les vaccins. Certaines individus de la dernière génération qui a un rdv seront donc testés mais pas vaccinés. 
+# Le pourcentage d'individus qui ont un rdv en clinique chaques jours est de 1%. Cela représente la capacité d'acceuil et de gestion limité d'un village avec 3750 habitants
+
+
+budget_restant = 21000 ## Au départ, le budget restant est le budget total de 21 000$ 
+cout_vaccin = 17
+cout_rat = 4
+pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clinique chaques jours. 
+
+"""
+ RDVclinique(arg1, arg2, arg3, arg4, arg5)
+
+ Simule les visites à la clinique selon la stratégie de gestion adoptée, et vérifie les contraintes budgétaire pour chaques étapes du processus. 
+
+ # Arguments 
+ arg1 = la population 
+ arg 2 : le budget restant qui se met a jour chaques jours, après chaque test ou vaccination
+ arg 3 : le coût d'un test RAT
+ arg 4 : le coût d'un vaccin 
+ arg 5 : pourcentage de la population qui a un rdv en clinique chaques jours
+
+ # Retour
+ Le budget restant après les tests et vaccins de la journée, et le statut des agents qui ont un rdv a changer, selon les résultat des tests. 
+ """
+
+function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)
+
+    ##  vérifie que le budget restant est suffisant pour effectuer les tests des rdv de la journée 
+    while budget_restant > 0
+        untest = untested(population) ## Objet contenant les agents qui n'ont pas encore été testés ( qui n'ont pas eu de RDV )
+        num_to_test = min(length(untest), round(Int, pourcent * length(untest))) 
+        ## Fait un objet contentant les rdv de la journée, qui sont un échantillon de 1% de la population qui n'ont jamais été testés. 
+    
+        ## Vérifie que le budget restant couvre les côuts pour les tests des RDV de la journée 
+        if num_to_test * cout_rat > budget_restant
+            num_to_test = budget_restant ÷ cout_rat ## si le coût est trop élevé pour tester tout les indivius, tester le maximum possible avec le budget restant 
+        end
+
+        ## Mettre à jour le budget restant après le cout des tests du jour 
+        budget_restant -= num_to_test * cout_rat
+
+        ## Marque les agents qui ont un rdv comme testés, pour ne pas qu'ils puissent avoir un rdv à nouveau dans les jours suivants. 
+        agent_test = shuffle(untest)[1:num_to_test]
+        for agent in agent_test
+            agent.tested = true
+        end
+
+        ## Pour le réalisme des test, inclu 5% de Faux négatifs
+        infectueux_detecte = Agent[] # objet avec les agents infectueux détectés ( vide)
+        for agent in agent_test
+            if agent.infectious && rand() > 0.05  # 95% de chance de détecter un infecté
+                push!(infectueux_detecte, agent)
+            end
+        end
+
+        ## Vaccination des agents testés malade lors du RDV 
+        # En raison des faux negatifs, ce ne sont pas  tout les agents infectés qui sont détectés ( 95% de chance de détecter un infectueux)
+        num_to_vaccinate = length(infectueux_detecte) ## Nombre d'agents qui ont été testés et qui sont malade. Ce sont ceux qui vont être vacciné le jour même
+
+        ## Vérifier si le budget restant couvre les coût pour vacciné tout les agents qui ont été testés malade lors du RDV  
+        if num_to_vaccinate * cout_vaccin > budget_restant
+            num_to_vaccinate = budget_restant ÷ cout_vaccin ## si le coût est trop élevé pour vacciner tout les indivius, tester le maximum possible avec le budget restant 
+        end
+
+        ## Mettre à jour le budget restant après le cout des vaccins du jour
+        budget_restant -= num_to_vaccinate * cout_vaccin
+
+        ## Vacciner les agents qui ont été testés malade lors du RDV, et les mettre en isolation pendant 2 jour 
+        ##L'isolation est représenté par le statut "ispending" qui est également la période d'attente de l'efficacité du vaccin 
+        for agent in infectueux_detecte[1:num_to_vaccinate]
+            if agent.infectious
+                administrer_vaccin!(agent) # Applique le vacin et débute le clock de 2 jour avant l'immunité 
+                agent.pending = true # statut de l'agent quivient d'être vacciné change pour "pending", ce qui correspond au 2 jour avant l'immunité
+            end
+        end
+    end
+    return budget_restant
+end
+     
+
 
 # # Initialisation de la simulation
 
+# Paramètes initiaux du modèle
 # Population initiale :
 
 function Population(L::Landscape, n::Integer)
     return rand(Agent, L, n)
 end
 
-population = Population(L, 3750) ;       # 3750 étant la taille de la population (C2)
+Base.show(io::IO, ::MIME"text/plain", p::Population) = print(io, "Une population avec $(length(p)) agents")
+
+population = Population(L, 3750)      # 3750 étant la taille de la population (C2)
+
 
 # Choisir au hasard dans la population un infecté (cas index) C5 :
 
@@ -236,10 +509,11 @@ tick = 0
 maxlength = 2000
 
 # Pour étudier les résultats de la simulation, nous allons stocker la taille de
-# populations à chaque pas de temps:
+# populations à chaque pas de temps ( chaques jours):
 
 S = zeros(Int64, maxlength);        # série temporelle sain
 I = zeros(Int64, maxlength);        # série temporelle infectieux
+V = zeros(Int64, maxlength);
 
 # Événement d'infection : 
 # Mais nous allons aussi stocker tous les évènements d'infection qui ont lieu
@@ -269,18 +543,33 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
     ## On spécifie que nous utilisons les variables définies plus haut
     global tick, population
 
-    tick += 1
+    tick += 1 # changement dans les décompte de 1 jours à chaques itération
+
+    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) # Résultat du budget restant selon ce les rdv de la journée
+
+    ## Mettre a jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours
+    ## Lorsque le décompte de " pending" de 2 jour est passé, l'agent change de statut pour "vacciné""
+    for agent in Population
+        if agent.pending && vaccin_clock != 0
+            vaccin_clock -= 1
+        elseif agent.pending && vaccin_clock == 0
+            agent.vaccinated = true
+            agent.pending = false
+        end
+    end
 
     ## Mouvement : les agents bougent d'une case
+    ## Les agents qui sont en isolation bouge quand même, mais on considère qu'ils ont des mesures sanitaires ( ex : porte un masque)
     for agent in population
         move!(agent, L; torus=false)
     end
 
     ## Infection : les infectieux ont 40% d'infecter un voisin sain au hasard (C3)
+    ## Les agents qui sont en isolation ( en attente de l'efficacité du vaccin) et les personnes vaccinés ne peuvent pas transmettre l'infection. 
     for agent in Random.shuffle(infectious(population))
         neighbors = healthy(incell(agent, population))
         for neighbor in neighbors
-            if rand() <= 0.4
+            if !neighbor.pending && !neighbor.vaccinated && rand() <= 0.4
                 neighbor.infectious = true
                 push!(events, InfectionEvent(tick, agent.id, neighbor.id, agent.x, agent.y))
             end
@@ -298,9 +587,10 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
     ## Enregistrement dans la série temporelle respective
     S[tick] = length(healthy(population))
     I[tick] = length(infectious(population))
+    V[tick] = length(vaccinated(population))
 
 end
-
+# Quand clock = 0 changer le statut pour vacciner
 # ## Analyse des résultats
 
 # ### Série temporelle
@@ -423,8 +713,18 @@ include("code/01_test.jl")
 # "timing" plus commence tôt...
 
 
+# On ne considere pas l'immigration et émigration
 
+# Les personne qui sont en " isolation " et ne peuvent pas transmettre l'infection bougent quand même à chaques generation, ce qui enleve du realiste. on peut considrer que'elles utilise des mesures sanitaire(ex : porte un masque )
 
+# Notre vaccin agit plus comme un "antidote" que une maniere de protéger les individus sains
+
+# limite de l'isolation 
+
+# puisque 1% de la population peut avoir un rdv en clinique chaques jours, et on donne des rdv seulement à ceux qui sont
+# jamais été testé, il y a donc de moins en moins de personnes qui sont vaccinés et testés par jours mais on peut tester et vacciner plus longtemps. 
+
+# dans une vrai pandémie, il y a beacuoup de cas diagnostiquer au debut car tout le monde devient au courant de la maladie d'un coup et se fait tester 
 
 
 # On peut aussi citer des références dans le document `references.bib`, qui doit
