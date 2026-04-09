@@ -120,15 +120,15 @@
 
 # Pour les graphiques
 
-using CairoMakie            
+using CairoMakie
 CairoMakie.activate!(px_per_unit=6.0)
-import StatsBase 
+import StatsBase
 using StatsBase
-using Random 
+using Random
 
 # Initialisation de nombre aléatoire       
 
-import Random 
+import Random
 Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
@@ -150,7 +150,7 @@ Base.@kwdef mutable struct Agent        ## création de valeurs par défaut pouv
     y::Int64 = 0
     clock::Int64 = 21                   ## nombre de jours avant la mort si infecté (C4)
     infectious::Bool = false            ## Savoir si agent est infectueux 
-    vaccin_clock:: Int64 = 2            ## Nombre de jour avant l'immunité une fois le vaccin administé
+    vaccin_clock::Int64 = 2            ## Nombre de jour avant l'immunité une fois le vaccin administé
     vaccinated::Bool = false            ## savoir si agent immunisé par vaccin (C6)
     id::UUIDs.UUID = UUIDs.uuid4()      ## identifiant unique généré automatiquement
     tested::Bool = false                ## Savoir si agent est testé 
@@ -326,7 +326,7 @@ tested(pop::Vector{Agent}) = filter(istested, pop)
 ## Retour
  True si vacciné mais pas encore efficace
  """
-ispending(agent::Agent)= agent.vaccin_clock
+ispending(agent::Agent) = agent.vaccin_clock
 
 
 # On peut maintenant définir une fonction pour prendre uniquement les agents qui
@@ -348,7 +348,7 @@ const Population = Vector{Agent}
 ## Retour
  Tout les individus infectueux
  """
-infectious(pop::Population) = filter(isinfectious, pop)     
+infectious(pop::Population) = filter(isinfectious, pop)
 
 ## Retourne les agents sains 
 
@@ -363,7 +363,7 @@ infectious(pop::Population) = filter(isinfectious, pop)
 ## Retour
  Tout les individus sains
  """
-healthy(pop::Population) = filter(ishealthy, pop)          
+healthy(pop::Population) = filter(ishealthy, pop)
 
 ## Retourne les agents non testés, qui seront ceux qui ont des RDV à la clinique 
 """
@@ -377,7 +377,7 @@ healthy(pop::Population) = filter(ishealthy, pop)
 ## Retour
  Tout les individus non testés
  """
-untested(pop::Population) = filter(!istested, pop)  
+untested(pop::Population) = filter(!istested, pop)
 
 
 # Nous allons enfin écrire une fonction pour trouver l'ensemble des agents d'une
@@ -456,16 +456,15 @@ pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clini
 
 ## Retour
  Le budget restant après les tests et vaccins de la journée, et le statut des agents qui ont un rdv a changer, selon les résultat des tests. 
- """
-
+"""
 function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)
 
     ##  vérifie que le budget restant est suffisant pour effectuer les tests des rdv de la journée 
     while budget_restant > 0
         untest = untested(population) ## Objet contenant les agents qui n'ont pas encore été testés ( qui n'ont pas eu de RDV )
-        num_to_test = min(length(untest), round(Int, pourcent * length(untest))) 
+        num_to_test = min(length(untest), round(Int, pourcent * length(untest)))
         ## Fait un objet contentant les rdv de la journée, qui sont un échantillon de 1% de la population qui n'ont jamais été testés. 
-    
+
         ## Vérifie que le budget restant couvre les côuts pour les tests des RDV de la journée 
         if num_to_test * cout_rat > budget_restant
             num_to_test = budget_restant ÷ cout_rat ## si le coût est trop élevé pour tester tout les indivius, tester le maximum possible avec le budget restant 
@@ -489,7 +488,7 @@ function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent
         end
 
         ## Vaccination des agents testés malade lors du RDV 
-        # En raison des faux negatifs, ce ne sont pas  tout les agents infectés qui sont détectés ( 95% de chance de détecter un infectueux)
+        ## En raison des faux negatifs, ce ne sont pas  tout les agents infectés qui sont détectés ( 95% de chance de détecter un infectueux)
         num_to_vaccinate = length(infectueux_detecte) ## Nombre d'agents qui ont été testés et qui sont malade. Ce sont ceux qui vont être vacciné le jour même
 
         ## Vérifier si le budget restant couvre les coût pour vacciné tout les agents qui ont été testés malade lors du RDV  
@@ -504,14 +503,14 @@ function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent
         ##L'isolation est représenté par le statut "ispending" qui est également la période d'attente de l'efficacité du vaccin 
         for agent in infectueux_detecte[1:num_to_vaccinate]
             if agent.infectious
-                administrer_vaccin!(agent) # Applique le vacin et débute le clock de 2 jour avant l'immunité 
-                agent.pending = true # statut de l'agent quivient d'être vacciné change pour "pending", ce qui correspond au 2 jour avant l'immunité
+                administrer_vaccin!(agent) ## Applique le vacin et débute le clock de 2 jour avant l'immunité 
+                agent.pending = true ## statut de l'agent quivient d'être vacciné change pour "pending", ce qui correspond au 2 jour avant l'immunité
             end
         end
     end
     return budget_restant
 end
-     
+
 
 
 # # Initialisation de la simulation
@@ -620,7 +619,9 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
     V[tick] = length(vaccinated(population))
 
 end
+
 # Quand clock = 0 changer le statut pour vacciner
+
 # ## Analyse des résultats
 
 # ### Série temporelle
@@ -674,26 +675,26 @@ f
 # position de chaque infection:
 
 if length(events) > 0
- t = [event.time for event in events];
- pos = [(event.x, event.y) for event in events];
- 
- f = Figure()
- ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
- hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
- Colorbar(f[1, 2], hm, label="Time of infection")
- hidedecorations!(ax)
- current_figure()
-end 
+    t = [event.time for event in events]
+    pos = [(event.x, event.y) for event in events]
+
+    f = Figure()
+    ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
+    hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
+    Colorbar(f[1, 2], hm, label="Time of infection")
+    hidedecorations!(ax)
+    current_figure()
+end
 
 # # Figures supplémentaires
 
 # Visualisation des infections sur l'axe x
 
- scatter(t, first.(pos), color=:black, alpha=0.5)
+scatter(t, first.(pos), color=:black, alpha=0.5)
 
 # et y
 
- scatter(t, last.(pos), color=:black, alpha=0.5)
+scatter(t, last.(pos), color=:black, alpha=0.5)
 
 # Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
 # modèle hors du document principal.
