@@ -578,10 +578,10 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
 
     ## Mettre a jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours
     ## Lorsque le décompte de " pending" de 2 jour est passé, l'agent change de statut pour "vacciné""
-    for agent in Population
-        if agent.pending && vaccin_clock != 0
-            vaccin_clock -= 1
-        elseif agent.pending && vaccin_clock == 0
+    for agent in population
+        if agent.pending && agent.vaccin_clock != 0
+            agent.vaccin_clock -= 1
+        elseif agent.pending && agent.vaccin_clock == 0
             agent.vaccinated = true
             agent.pending = false
         end
