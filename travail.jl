@@ -18,33 +18,47 @@
 
 # # Introduction 
 
-# Les maladies infectieuses sont l'une des principales menaces pour la santé de
-# la population. Nous l'avons bien observé avec le Covid19, l'isolation et les
-# nombreux décès. De nos jours, les virus deviennent de plus en plus virulent et
-# sont transmis facilement, que ça soit par goutelettes, contact ou voyagement.
-# Les virus sont insivibles, donc il peut être difficile de prévenir
-# l'infection. En prévention, il y a la vaccination qui permet de se protéger en
-# s'immunisant contre le virus et les tests de détection pour protéger les
-# autres.
+# Les maladies infectieuses sont l'une des principales menaces pour la santé
+# publique mondiale . Malgré les progrès significatifs des systèmes de santé,
+# des infections comme la Covid-19 ont montré à quel point ces maladies peuvent
+# se propager rapidement, entraîner l'isolement social et provoquer de nombreux décès.
+# (@cascella2026covid) La transmission de virus par goutelettes, contacte direct ou voyage
+# facilite leur propagation dans une population, et leur nature invisible rend la précention
+# difficile sans interventions ciblées. La vaccination est l'une des mesures les plus efficaces
+# pour réduire les risques d'infection et protéger la population. En effet, elle a permis
+# d'éviter plusieurs millions de décès chaque année grâce à la prévention de maladies graves
+# comme la rougeole, le tétanos ou le polio (@ginglen2026immunization).
 
 # Dans certaines situations épidémiologiques, les individus infectés peuvent
 # demeurer asympotomatiques tout en étant capables de transmettre la maladie.
-# Dans ces conditions, l'identification des personnes infectieuses dépend de
-# l'utilisation de tests diagnostiques qui ne sont pas toujours fiables. Cette
-# incertitude représente un défi important pour la mise en place d'interventions
-# de santé publique efficaces, puisque la prévalence réelle de la maladie ne
-# peut être estimée qu'à partir des résultats de dépistage.
+# Cette transmission silencieuse complique l'identification des cas infectieux
+# et limite l'efficacité des approches reposant uniquement sur les symptômes.
+# Les modèles épidémiologiques qui impliquent des individus asymptomatiques 
+# montrent que ces derniers jouent un rôle clé dans la dynamique de propagation
+# et doivent être pris en compte dans les stratégies de contrôle (@kuddus2025modelling).
 
-# Pour étudier ces enjeux, nous utilisons un modèle de simulation agent basé qui
-# représente la propagation d'une maladie infectieuse dans une population qui
+# Dans ce contexte, le dépistage devient un outil essentiel pour détecter les individus infectieux.
+# Toutefois, les tests diagnostiques présentent des limites de sensibilité, ce qui introduit
+# une incertitude dans l'estimation de la prévalence réelle et dans la prise de décision en
+# santé publique. Parallèlement, la vaccination demeure une intervention majeure pour réduire
+# la transmission et la mortalité, en particulier lorsqu'elle est utilisée de manière
+# ciblée et optimisée (@yakob2025age).
+
+# Afin d'évaluer l'efficacité de différentes stratégies d'intervention, les modèles de
+# simulation, notamment ls modèles agents, sont largement utilisés por reproduire la propagation
+# des maladies infectieuses et teste l'impact combiné du dépistage, de l'isolement et de la vaccination.
+# Ces approches permettent d'explorer différentes allocations de ressources et d'identifier des stratégies
+# optimales de contrôle (@stephenson2020comparing).
+
+# Dans ce travail, nous utilisons un modèle de simulation basé sur les agents
+# pour représenter la propagation d'une maladie infectieuse dans une population qui
 # est initialement saine. La maladie simulée possède une transmision par contact
-# direct, une durée d'infection fixe et une mortalité complète en absence
+# direct, une durée d'infection fixe et entraîne une mortalité complète en absence
 # d'ntervention. Un vaccin entièrement efficace est disponible, mais il y a un
-# délai de deux générations après son administration avant que l'immunité ne
+# délai de deux générations (jours) après son administration avant que l'immunité ne
 # soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des
 # contraintes budgétaires, où les ressources peuvent être allouées soit au
-# dépistage par des tests antigéniques rapides, soit à la vaccination des
-# individu.
+# dépistage par des tests antigéniques rapides, soit à la vaccination des individus.
 
 # L'objectif de ce travail est donc de développer et d'évaluer une stratégie de
 # vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
@@ -52,37 +66,36 @@
 
 # # Présentation du modèle
 
-# Dans cette simulation, nous avons un virus causant la mort après trois
-# semaines d'infection (21 jours), comme observé pour certaines maladie
-# infectieuses très virulentes (par exemple, Ebola). La population initiale est
-# complètement saine, et un individu est choisi au hasard pour être infecté au
-# début de la simulation. Chaque agent infectieux a une probabilité de
-# transmission de 40% à ses voisins dans la même cellule, ce qui représente un
-# contact direct.
+# La simulation modélise la propagation d’une maladie infectieuse très virulente, similaire à Ebola, causant la mort 21 jours après l’infection.
+# La population initiale est entièrement naïve (ne possède aucune immunité) composée de 3750 individus, répartis aléatoirement sur une lattice
+# bidimensionnelle de -50 à 50 sur chaque axe. Un individu est choisi au hasard pour être infecté au début de la simulation, représentant le premier cas.
+# Les agents (individus) se déplacent quotidiennement sur la lattice configurée en torus, de sorte que ceux qui atteignent les bords réapparaissent de l’autre côté.
+# Les individus infectieux ont une probabilité de 0,4 de transmettre l’infection à leurs voisins dans la même cellule, représentant le contact direct dans la même
+# case de la lattice.Les individus infectieux sont asymptomatiques et ne peuvent être détectés qu’à partir d’un test antigénique rapide (RAT). Ce test possède une
+# précision de 95 %, ce qui implique un taux de faux négatifs de 5 %, et il ne permet pas de connaître depuis combien de temps un individu est infectieux.
+# La prévalence réelle de la maladie ne peut donc être estimée que par des tests. Chaque jour, un maximum de 1 % des individus non testés est sélectionné pour un
+# rendez-vous (RDV) à la clinique, pour tenir compte des contraintes logistiques d’accueil. Les rendez-vous sont interrompus dès que le budget total de 21 000 $
+# est épuisé, avec un coût de 4 $ par test et 17 $ par dose de vaccin. Le modèle intègre une stratégie de vaccination ciblée, d'abord, les individus testés positifs
+# au RAT sont immédiatement vaccinés si le budget le permet. Ensuite, la vaccination déclenche une période transitoire de 2 générations, durant laquelle les agents
+# sont considérés en quarantaine/isolation pour réduire leur contribution à la transmission. Après cette période, les individus deviennent complètement immunisés,
+# protégés contre l’infection, la transmission et la mortalité. Cette approche permet d’évaluer l’efficacité de la campagne de vaccination en comparant la mortalité
+# totale avec intervention à celle observée en absence de contrôle, ainsi que le coût total des tests et vaccinations.
 
-# Les individus infectés sont asymptomatiques, ce qui signifie que l'infection
-# ne peut être détectée qu'à l'aide d'un test antigénique rapide (RAT). Ce test
-# présente une précision de 95%, ce qui implique un taux de faux négatifs de 5%.
-# Cette incertitude reflète le fait qu'en réalité, les tests diagnostiques ne
-# sont jamais parfaits et que la prévalence réelle de la maladie reste inconnue
-# sans un dépistage systématique.
+# # Stratégie de vaccination
 
-# Pour prévenir la propagation de l'infection, un vaccin entièrement efficace
-# est disponible. Cependant, son effet protecteur n'apparaît que deux
-# générations après son administration, ce qui correspond à un délai biologique
-# pour le développement de l'immunité. La vaccination protège donc contre
-# l'infection, mais aussi la mortalité et empêche aussi toute réinfection.
-
-# La simulation intègre des contraintes budgétaires strictes: (1) Chaque dose de
-# vaccin coûte 17$; (2) Chaque test RAT coûte 4$; (3) Le budget total disponible
-# est de 21 000$. La stratégie de vaccination doit donc être conçue en tenant
-# compte de la limite financière, en répartissant les ressources entre dépistage
-# et vaccination.
-
-# La simulation prend en compte que l'intervention, donc les tests et
-# vaccinations, ne peut commencer qu'après le décès du premier individu,
-# reflétant ainsi le fait que la détection initiale et l'intervention des
-# autorités peuvent être retardées dans une épidémie réelle.
+# La stratégie de vaccination adoptée repose sur une approche ciblée combinant dépistage actif et intervention rapide, tout en respectant les contraintes budgétaires 
+# et opérationnelles imposées par le modèle. Puisque les individus infectieux sont asymptomatiques et que la prévalence réelle de la maladie ne peut être connue sans 
+# dépistage, une clinique simulée reçoit quotidiennement un nombre limité d’individus correspondant à 1 % de la population non testée. Cette sélection aléatoire vise
+# à reproduire une capacité de santé publique réaliste où les ressources diagnostiques sont limitées, tout en permettant une estimation indirecte de la circulation de
+# l’infection dans la population. Lors de leur visite, les individus sont d’abord soumis à un test antigénique rapide (RAT), possédant une sensibilité de 95 %.
+# Les individus détectés comme infectieux sont immédiatement vaccinés si le budget disponible le permet. La vaccination déclenche une période transitoire de deux
+# générations durant laquelle les agents sont considérés en attente d’immunité et placés en isolation fonctionnelle, réduisant ainsi leur contribution à la transmission
+# pendant que la protection vaccinale s’établit. Une fois que ce délai soit écoulé, les individus deviennent complètement immunisés. Ainsi, ils ne peuvent plus être
+# infectés, transmettre la maladie ni mourir de l’infection. Cette stratégie vise à interrompre précocement les chaînes de transmission en identifiant et immunisant
+# prioritairement les individus déjà infectieux plutôt qu’en vaccinant massivement la population au hasard. Le choix d’allouer les ressources d’abord au dépistage
+# permet d’optimiser l’utilisation du budget disponible en dirigeant les doses vaccinales vers les individus ayant la plus forte probabilité de propager l’épidémie.
+# L’efficacité de la campagne est ensuite évaluée en comparant la mortalité totale obtenue avec l'intervention à celle observée en absence de contrôle, tout en
+# considérant le coût total engagé pour les tests et la vaccination.
 
 # A AJOUTER : DEPLACEMENT DES INDIVIDUS, STRATEGIE DE VACCINATION (IMPOTANT),
 #ISOLATION DES MALADES VACCINE TEST ALEATOIRE CAR ASYMPTOMATIQUE, LATTICE TORUS,
@@ -92,28 +105,24 @@
 
 # # Implémentation
 
-# 1. Durée et suivi de la maladie: Chaque agent infectieux reste malade pendant 21 jours avant de mourir si aucune intervention n'est appliquée.
-# La durée de la maladie est suivie dans le modèle par le compteur `clock` de chaque agent. Le décès survient automatiquement lorsque le compteur atteint zéro.
+# La simulation a été réalisée en utilisant un modèle agent basé, où chaque agent représente un individu de la population. La population initiale de 3750 individus est 
+# répartie sur une lattice bidimensionnelle configurée en torus, ce qui permet aux agents de se déplacer continuellement sans rencontrer de bords. Chaque agent possède
+# des attributs décrivant son état de santé, son statut vaccinal et le temps depuis infection ou vaccination. La boucle principale de la simulation est exécutée génération
+# par génération. À chaque pas :
 
-# 2. Déclenchement: Campagne commence après le décès du premier cas.
+# 1. Les agents se déplacent aléatoirement sur la lattice.
 
-# 3. Détection des individus infectieux (test RAT): On teste les agents choisis au hasard dans la population saine pour identifier les infectés.
-#Les tests coûtent 4$ chacun et détectent 95% des infectés.
+# 2. Les interactions locales sont évaluées, donc chaque agent infectieux a une probabilité de 0,4 de transmettre la maladie à ses voisins immédiats.
 
-# 4. Vaccination: Tous les individus sains détectés après test RAT sont vaccinés. Chaque vaccin coûte 17$ et devient actif après 2 jours . 
-# Les agents vaccinés sont marqués dans le modèle (vaccinated=true) et le compteur vaccine_timer suit le délai jusqu'à l'immunité.
-# On continue jusqu'à épuisement du budget (tests RAT + vaccins)
+# 3. Le dépistage est effectué selon la capacité clinique maximale (1 % des individus non testés par jour), en respectant le budget restant. Les agents sélectionnés passent
+# le test antigénique rapide (RAT), et les résultats sont simulés avec une précision de 95 %.
 
-# 5. Budget: 21 000$ pour l'ensemble de la campagne. Le code vérifie à chaque test ou vaccinaition que le budget restant est suffisant.
-# Chaque test ou vaccination réduit le budget disponible. Quand le budget est épuisé, on arrête les tests et les vaccinations
-# mais la simulation continue jusqu'à extinction de l'épidémie.
+# 4. Les agents testés positifs sont vaccinés si le budget le permet, et entrent en quarantaine fonctionnelle pendant la période transitoire de 2 générations.
 
-# 6. Règles de propagation: Individus infectieux sont asymptomatiques et peuvent infecter les voisins avec une probabilité de 40%. Le modèle suit le temps de maladie (clock).
-# L'infection ne peut pas survenir chez un agent vacciné après l'activation du vaccin.
+# 5. Les statistiques sont mises à jour à chaque génération : nombre d’infections, de décès, de vaccinations, tests effectués, et coût cumulé.
 
-# 7. Mise à jour des agents: À chaque génération, les états des agents sont mis à jour: `infectious` pour les agents infectés, `vaccinated` pour les agents vaccinés 
-# `vaccine_timer` pour déclencher l'effet du vaccin après 2 générations, et `clock` pour suivre la durée de la maladie et déclencher le décès au bon moment.
-
+# La simulation s’arrête soit lorsque tous les agents ont été infectés ou immunisés, soit lorsque le budget est épuisé. Les résultats finaux sont collectés pour comparer
+# la mortalité avec et sans intervention, et pour évaluer l’efficacité et le coût total de la campagne de vaccination.
 # # Code pour le modèle
 
 # ## Packages nécessaires (mettre dans project)
