@@ -18,50 +18,77 @@
 
 # # Introduction 
 
-# Les maladies infectieuses sont l'une des principales menaces pour la santé de la population. Nous l'avons bien observé avec le 
-# Covid19, l'isolation et les nombreux décès. De nos jours, les virus deviennent de plus en plus virulent et sont transmis facilement,
-# que ça soit par goutelettes, contact ou voyagement. Les virus sont insivibles, donc il peut être difficile de prévenir l'infection.
-# En prévention, il y a la vaccination qui permet de se protéger en s'immunisant contre le virus et les tests de détection pour 
-# protéger les autres.
+# Les maladies infectieuses sont l'une des principales menaces pour la santé de
+# la population. Nous l'avons bien observé avec le Covid19, l'isolation et les
+# nombreux décès. De nos jours, les virus deviennent de plus en plus virulent et
+# sont transmis facilement, que ça soit par goutelettes, contact ou voyagement.
+# Les virus sont insivibles, donc il peut être difficile de prévenir
+# l'infection. En prévention, il y a la vaccination qui permet de se protéger en
+# s'immunisant contre le virus et les tests de détection pour protéger les
+# autres.
 
-# Dans certaines situations épidémiologiques, les individus infectés peuvent demeurer asympotomatiques tout en étant capables de transmettre la maladie.
-# Dans ces conditions, l'identification des personnes infectieuses dépend de l'utilisation de tests diagnostiques qui ne sont pas toujours fiables.
-# Cette incertitude représente un défi important pour la mise en place d'interventions de santé publique efficaces, puisque la prévalence réelle de la
-# maladie ne peut être estimée qu'à partir des résultats de dépistage.
+# Dans certaines situations épidémiologiques, les individus infectés peuvent
+# demeurer asympotomatiques tout en étant capables de transmettre la maladie.
+# Dans ces conditions, l'identification des personnes infectieuses dépend de
+# l'utilisation de tests diagnostiques qui ne sont pas toujours fiables. Cette
+# incertitude représente un défi important pour la mise en place d'interventions
+# de santé publique efficaces, puisque la prévalence réelle de la maladie ne
+# peut être estimée qu'à partir des résultats de dépistage.
 
-# Pour étudier ces enjeux, nous utilisons un modèle de simulation agent basé qui représente la propagation d'une maladie infectieuse dans une population
-# qui est initialement saine. La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et une mortalité complète en absence d'ntervention.
-# Un vaccin entièrement efficace est disponible, mais il y a un délai de deux générations après son administration avant que l'immunité ne soit acquise.
-# De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les ressources peuvent être allouées soit au dépistage par
-# des tests antigéniques rapides, soit à la vaccination des individu.
+# Pour étudier ces enjeux, nous utilisons un modèle de simulation agent basé qui
+# représente la propagation d'une maladie infectieuse dans une population qui
+# est initialement saine. La maladie simulée possède une transmision par contact
+# direct, une durée d'infection fixe et une mortalité complète en absence
+# d'ntervention. Un vaccin entièrement efficace est disponible, mais il y a un
+# délai de deux générations après son administration avant que l'immunité ne
+# soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des
+# contraintes budgétaires, où les ressources peuvent être allouées soit au
+# dépistage par des tests antigéniques rapides, soit à la vaccination des
+# individu.
 
-# L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
+# L'objectif de ce travail est donc de développer et d'évaluer une stratégie de
+# vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
 # respectant les contraintes biologiques et budgétaires imposées par le modèle. 
 
 # # Présentation du modèle
 
-# Dans cette simulation, nous avons un virus causant la mort après trois semaines d'infection (21 jours), comme observé pour certaines maladie infectieuses très virulentes
-# (par exemple, Ebola). La population initiale est complètement saine, et un individu est choisi au hasard pour être infecté au début de la simulation.
-# Chaque agent infectieux a une probabilité de transmission de 40% à ses voisins dans la même cellule, ce qui représente un contact direct.
+# Dans cette simulation, nous avons un virus causant la mort après trois
+# semaines d'infection (21 jours), comme observé pour certaines maladie
+# infectieuses très virulentes (par exemple, Ebola). La population initiale est
+# complètement saine, et un individu est choisi au hasard pour être infecté au
+# début de la simulation. Chaque agent infectieux a une probabilité de
+# transmission de 40% à ses voisins dans la même cellule, ce qui représente un
+# contact direct.
 
-# Les individus infectés sont asymptomatiques, ce qui signifie que l'infection ne peut être détectée qu'à l'aide d'un test antigénique rapide (RAT).
-# Ce test présente une précision de 95%, ce qui implique un taux de faux négatifs de 5%. Cette incertitude reflète le fait qu'en réalité, les tests diagnostiques
-# ne sont jamais parfaits et que la prévalence réelle de la maladie reste inconnue sans un dépistage systématique.
+# Les individus infectés sont asymptomatiques, ce qui signifie que l'infection
+# ne peut être détectée qu'à l'aide d'un test antigénique rapide (RAT). Ce test
+# présente une précision de 95%, ce qui implique un taux de faux négatifs de 5%.
+# Cette incertitude reflète le fait qu'en réalité, les tests diagnostiques ne
+# sont jamais parfaits et que la prévalence réelle de la maladie reste inconnue
+# sans un dépistage systématique.
 
-# Pour prévenir la propagation de l'infection, un vaccin entièrement efficace est disponible. Cependant, son effet protecteur n'apparaît que deux générations après
-# son administration, ce qui correspond à un délai biologique pour le développement de l'immunité. La vaccination protège donc contre l'infection, mais aussi la mortalité
-# et empêche aussi toute réinfection.
+# Pour prévenir la propagation de l'infection, un vaccin entièrement efficace
+# est disponible. Cependant, son effet protecteur n'apparaît que deux
+# générations après son administration, ce qui correspond à un délai biologique
+# pour le développement de l'immunité. La vaccination protège donc contre
+# l'infection, mais aussi la mortalité et empêche aussi toute réinfection.
 
-# La simulation intègre des contraintes budgétaires strictes: (1) Chaque dose de vaccin coûte 17$; (2) Chaque test RAT coûte 4$; (3) Le budget total disponible est de 21 000$.
-# La stratégie de vaccination doit donc être conçue en tenant compte de la limite financière, en répartissant les ressources entre dépistage et vaccination.
+# La simulation intègre des contraintes budgétaires strictes: (1) Chaque dose de
+# vaccin coûte 17$; (2) Chaque test RAT coûte 4$; (3) Le budget total disponible
+# est de 21 000$. La stratégie de vaccination doit donc être conçue en tenant
+# compte de la limite financière, en répartissant les ressources entre dépistage
+# et vaccination.
 
-# La simulation prend en compte que l'intervention, donc les tests et vaccinations, ne peut commencer qu'après le décès du premier individu, reflétant ainsi le fait que la
-# détection initiale et l'intervention des autorités peuvent être retardées dans une épidémie réelle.
+# La simulation prend en compte que l'intervention, donc les tests et
+# vaccinations, ne peut commencer qu'après le décès du premier individu,
+# reflétant ainsi le fait que la détection initiale et l'intervention des
+# autorités peuvent être retardées dans une épidémie réelle.
 
-
-# A AJOUTER : DEPLACEMENT DES INDIVIDUS, STRATEGIE DE VACCINATION (IMPOTANT), ISOLATION DES MALADES VACCINE
-#TEST ALEATOIRE CAR ASYMPTOMATIQUE, LATTICE TORUS, QUARENTAINE, ON ARRETE LES RDV QD IL N'AS PLUS DE BUDGET 
-# MAXIMUM DE 1% PAR JOUR CAR IL Y A DES CONTRAINTES LOGISTIQUE POUR ACCEUILLIR LES AGENTS EN CLINIQUE 
+# A AJOUTER : DEPLACEMENT DES INDIVIDUS, STRATEGIE DE VACCINATION (IMPOTANT),
+#ISOLATION DES MALADES VACCINE TEST ALEATOIRE CAR ASYMPTOMATIQUE, LATTICE TORUS,
+# QUARENTAINE, ON ARRETE LES RDV QD IL N'AS PLUS DE BUDGET MAXIMUM DE 1% PAR
+# JOUR CAR IL Y A DES CONTRAINTES LOGISTIQUE POUR ACCEUILLIR LES AGENTS EN
+# CLINIQUE 
 
 # # Implémentation
 
@@ -92,6 +119,7 @@
 # ## Packages nécessaires (mettre dans project)
 
 # Pour les graphiques
+
 using CairoMakie            
 CairoMakie.activate!(px_per_unit=6.0)
 import StatsBase 
@@ -99,16 +127,19 @@ using StatsBase
 using Random 
 
 # Initialisation de nombre aléatoire       
+
 import Random 
 Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
+
 import UUIDs
 UUIDs.uuid4()
 
 # ## Création des types
 
 # Type d'agents
+
 # Les agents se déplacent dans un environnement en deux dimension représenté par une lattice, 
 # et on doit donc suivre leur position et leur état : 
 # soit si ils sont vaccinés, et si l'effet protecteur du vaccin est effectif ( soit 2 jours après l'injection)
@@ -119,7 +150,7 @@ Base.@kwdef mutable struct Agent        ## création de valeurs par défaut pouv
     y::Int64 = 0
     clock::Int64 = 21                   ## nombre de jours avant la mort si infecté (C4)
     infectious::Bool = false            ## Savoir si agent est infectueux 
-    vaccin_clock:: Int64 = 2                    ## Nombre de jour avant l'immunité une fois le vaccin administé
+    vaccin_clock:: Int64 = 2            ## Nombre de jour avant l'immunité une fois le vaccin administé
     vaccinated::Bool = false            ## savoir si agent immunisé par vaccin (C6)
     id::UUIDs.UUID = UUIDs.uuid4()      ## identifiant unique généré automatiquement
     tested::Bool = false                ## Savoir si agent est testé 
@@ -127,9 +158,11 @@ Base.@kwdef mutable struct Agent        ## création de valeurs par défaut pouv
 end
 
 # Type paysage
-# Définit les limites de la grille où les agents se déplacent
-# Ici, c'est une grille de -50 à 50 dans les deux directions, donc 100x100 = 10 000 cases au total (C1)
-# Les agents se trouvant dans la même cases sont considérés très proches, donc en contact direct 
+
+# Définit les limites de la grille où les agents se déplacent Ici, c'est une
+# grille de -50 à 50 dans les deux directions, donc 100x100 = 10 000 cases au
+# total (C1) Les agents se trouvant dans la même cases sont considérés très
+# proches, donc en contact direct 
 
 Base.@kwdef mutable struct Landscape
     xmin::Int64 = -25
@@ -153,25 +186,24 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 """
     Random.rand(arg1, arg2, arg3)
 
- Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
+    Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
 
- # Arguments 
- arg1 = Le type d'agent généré
- arg 2: paysage ou les agent sont généré,  qui se trouve dans la lattice L 
- arg 3 : ( facultatif ) nombre d'agents généré
+## Arguments 
+arg1 = Le type d'agent généré
+arg 2: paysage ou les agent sont généré,  qui se trouve dans la lattice L 
+arg 3 : ( facultatif ) nombre d'agents généré
 
- # Retour
- La fonction retourne un agent ou un tableau d'agent, selon l'argument 3
+## Retour
+La fonction retourne un agent ou un tableau d'agent, selon l'argument 3
 
- # Exemple 
- Cette fonction nous permet donc de générer un nouvel agent dans un paysage:
+## Exemple 
+Cette fonction nous permet donc de générer un nouvel agent dans un paysage:
 
- rand(Agent, L)
+rand(Agent, L)
 
- Mais aussi de générer plusieurs agents:
+Mais aussi de générer plusieurs agents:
 
- rand(Agent, L, 3)
-
+rand(Agent, L, 3)
 """
 Random.rand(::Type{Agent}, L::Landscape) = Agent(x=rand(L.xmin:L.xmax), y=rand(L.ymin:L.ymax))
 Random.rand(::Type{Agent}, L::Landscape, n::Int64) = [rand(Agent, L) for _ in 1:n]
@@ -183,17 +215,16 @@ Random.rand(::Type{Agent}, L::Landscape, n::Int64) = [rand(Agent, L) for _ in 1:
 """
     move!(arg1, arg2, arg3)
 
-  Permet le déplacement des aléatoire des agents sur la lattice dans les cases adjacentes 
-  chaques jours, ou rester sur place.
+Permet le déplacement des aléatoire des agents sur la lattice dans les cases adjacentes 
+chaques jours, ou rester sur place.
 
- # Arguments 
- arg1 = L'agent qui se déplace
- arg 2: paysage ou les agents se déplacent
- arg 3 : Si la lattice est torridale ou pas ( TRUE or FALSE)
+## Arguments 
+arg1 = L'agent qui se déplace
+arg 2: paysage ou les agents se déplacent
+arg 3 : Si la lattice est torridale ou pas ( TRUE or FALSE)
 
- # Retour
- La fonction retourne l'agent A, avec sa nouvelle position 
-
+## Retour
+La fonction retourne l'agent A, avec sa nouvelle position 
 """
 function move!(A::Agent, L::Landscape; torus=true)
     A.x += rand(-1:1)
@@ -217,16 +248,15 @@ end
 # Vérifier si un agent est infectieux
 
 """
- isinfectious(arg1)
+    isinfectious(arg1)
 
- Vérifie si L'agent est infecté 
+Vérifie si L'agent est infecté 
 
- # Arguments 
- arg1 = un agent
+## Arguments 
+arg1 = un agent
 
- # Retour
- True si infecté 
-
+## Retour
+True si infecté 
 """
 
 isinfectious(agent::Agent) = agent.infectious
@@ -237,10 +267,10 @@ isinfectious(agent::Agent) = agent.infectious
 
  Vérifie si L'agent est sain
 
- # Arguments 
+## Arguments 
  arg1 =  un agent
 
- # Retour
+## Retour
  True si sain
  
  """
@@ -253,10 +283,10 @@ ishealthy(agent::Agent) = !isinfectious(agent)
 
  Vérifie si L'agent est vacciné
 
- # Arguments 
+## Arguments 
  arg1 = un agent
 
- # Retour
+## Retour
  True si vacciné
  """
 isvaccinated(agent::Agent) = agent.vaccinated
@@ -270,10 +300,10 @@ vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop)
 
  Vérifie si L'agent est testé
 
- # Arguments 
+## Arguments 
  arg1 = un agent
 
- # Retour
+## Retour
  True si testé
  """
 istested(agent::Agent) = agent.tested
@@ -290,10 +320,10 @@ tested(pop::Vector{Agent}) = filter(istested, pop)
  Vérifie si L'agent est vacciné mais il n'as pas encore l'immunité, car la période de 2 jours n'est pas passée. 
  Cela correspond également à la période d'isolation des agents infectueux qui viennent d'être vaccinés. 
 
- # Arguments 
+## Arguments 
  arg1 = un agent
 
- # Retour
+## Retour
  True si vacciné mais pas encore efficace
  """
 ispending(agent::Agent)= agent.vaccin_clock
@@ -305,46 +335,46 @@ ispending(agent::Agent)= agent.vaccin_clock
 
 const Population = Vector{Agent}
 
-# retourne les agents malades
+## Retourne les agents malades
 
 """
  infectious(arg1)
 
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu infectueux
 
- # Arguments 
+## Arguments 
  arg1 = la population
 
- # Retour
+## Retour
  Tout les individus infectueux
  """
 infectious(pop::Population) = filter(isinfectious, pop)     
 
-# Retourne les agents sains 
+## Retourne les agents sains 
 
 """
  Healthy(arg1)
 
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu sains
 
- # Arguments 
+## Arguments 
  arg1 = la population
 
- # Retour
+## Retour
  Tout les individus sains
  """
 healthy(pop::Population) = filter(ishealthy, pop)          
 
-# Retourne les agents non testés, qui seront ceux qui ont des RDV à la clinique 
+## Retourne les agents non testés, qui seront ceux qui ont des RDV à la clinique 
 """
  untested(arg1)
 
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu non-testés
 
- # Arguments 
+## Arguments 
  arg1 = la population
 
- # Retour
+## Retour
  Tout les individus non testés
  """
 untested(pop::Population) = filter(!istested, pop)  
@@ -361,11 +391,11 @@ untested(pop::Population) = filter(!istested, pop)
  identifie tout les agents d'une populaiton qui sont en contact directs, avec un agent 
  Ils ont en fait les même coordonnés sur la lattice 
 
- # Arguments 
+## Arguments 
  arg1 = l'agent dont l'ont veut connaitre les contacts directs
  arg 2 = la population 
 
- # Retour
+## Retour
  Tout les agents de la population qui sont dans la même case qu'un agent 
  
  """
@@ -383,10 +413,10 @@ incell(target::Agent, pop::Population) = filter(ag -> (ag.x, ag.y) == (target.x,
 
  Initie un compte à rebourd de 2 jours ( 2 générations ) lorsqu'un agent devient vacciné ( changement de statut)
 
- # Arguments 
+## Arguments 
  arg1 = un agent 
 
- # Retour
+## Retour
  L'agent obtient le statut de "ispending" et un compte a rebour de 2 jours avant l'immunité est débuté
  
  """
@@ -417,14 +447,14 @@ pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clini
 
  Simule les visites à la clinique selon la stratégie de gestion adoptée, et vérifie les contraintes budgétaire pour chaques étapes du processus. 
 
- # Arguments 
+## Arguments 
  arg1 = la population 
  arg 2 : le budget restant qui se met a jour chaques jours, après chaque test ou vaccination
  arg 3 : le coût d'un test RAT
  arg 4 : le coût d'un vaccin 
  arg 5 : pourcentage de la population qui a un rdv en clinique chaques jours
 
- # Retour
+## Retour
  Le budget restant après les tests et vaccins de la journée, et le statut des agents qui ont un rdv a changer, selon les résultat des tests. 
  """
 
