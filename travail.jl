@@ -191,9 +191,8 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 # fonction:
 
 """
-    Random.rand(arg1, arg2, arg3)
-
-    Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
+Random.rand(arg1, arg2, arg3)
+ Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
 
 ## Arguments 
 arg1 : Le type d'agent généré
@@ -630,7 +629,7 @@ for _ in 1:10
     tick += 1 # changement dans les décompte de 1 jours à chaques itération
 
     ## Mettre un # devant la ligne suivante pour faire la simulation sans vaccination 
-    #budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
+    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
 
     ## Mettre a jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours
     ## Lorsque le décompte de " pending" de 2 jour est passé, l'agent change de statut pour "vacciné""
@@ -790,7 +789,7 @@ current_figure()
 
 # Attention! Il faut que le code soit inclus au bon endroit (avant que les fonctions déclarées soient appellées).
 
-# include("code/01_test.jl")
+include("code/01_test.jl")
 
 # ## Une autre section
 
