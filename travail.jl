@@ -611,7 +611,6 @@ for _ in 1:10
     population = Population(L, 3750) ## population initiale de 3750 individus sur le paysage
     rand(population).infectious=true ## un agent choisit au hasard pour être malade
     tick=0 ## temps remis a 0
-    budget_restant=21000 ## budget remis a 21000$
     morts = zeros(Int64, maxlength) ## objet pour stocker le nombre de morts 
     
     nb_tests = zeros(Int64, maxlength); ## objet pour stoker le nombre de tests effectués 
