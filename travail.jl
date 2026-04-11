@@ -622,7 +622,7 @@ for _ in 1:10
     V = zeros(Int64, maxlength);
     budget_par_jour = zeros(Int64, maxlength); 
     
-   while (length(infectious(population)) != 0) & (tick < maxlength)
+    while (length(infectious(population)) != 0) & (tick < maxlength)
 
     ## On spécifie que nous utilisons les variables définies plus haut
     global tick, population, budget_restant
