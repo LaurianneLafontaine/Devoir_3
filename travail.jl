@@ -619,11 +619,9 @@ for _ in 1:10
     I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
     V = zeros(Int64, maxlength);
     budget_par_jour = zeros(Int64, maxlength); 
+    budget_restant = 21000 ## Budget restant au debut est le budget total
     
    while (length(infectious(population)) != 0) & (tick < maxlength)
-
-    ## On spécifie que nous utilisons les variables définies plus haut
-    global tick, population, budget_restant
 
     tick += 1 # changement dans les décompte de 1 jours à chaques itération
 
