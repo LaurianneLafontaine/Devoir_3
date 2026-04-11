@@ -131,14 +131,12 @@
 
 using CairoMakie
 CairoMakie.activate!(px_per_unit=6.0)
-import StatsBase
 using StatsBase
 using Random
 
 # Initialisation de nombre aléatoire       
 
-import Random
-Random.seed!(2045)
+#Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
 
@@ -198,7 +196,7 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
     Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
 
 ## Arguments 
-arg1 = Le type d'agent généré
+arg1 : Le type d'agent généré
 arg 2: paysage ou les agent sont généré,  qui se trouve dans la lattice L 
 arg 3 : ( facultatif ) nombre d'agents généré
 
@@ -228,7 +226,7 @@ Permet le déplacement des aléatoire des agents sur la lattice dans les cases a
 chaques jours, ou rester sur place.
 
 ## Arguments 
-arg1 = L'agent qui se déplace
+arg1 : L'agent qui se déplace
 arg 2: paysage ou les agents se déplacent
 arg 3 : Si la lattice est torridale ou pas ( TRUE or FALSE)
 
@@ -262,7 +260,7 @@ end
 Vérifie si L'agent est infecté 
 
 ## Arguments 
-arg1 = un agent
+arg1 : un agent
 
 ## Retour
 True si infecté 
@@ -277,7 +275,7 @@ isinfectious(agent::Agent) = agent.infectious
  Vérifie si L'agent est sain
 
 ## Arguments 
- arg1 =  un agent
+ arg1 L: un agent
 
 ## Retour
  True si sain
@@ -293,15 +291,13 @@ ishealthy(agent::Agent) = !isinfectious(agent)
  Vérifie si L'agent est vacciné
 
 ## Arguments 
- arg1 = un agent
+ arg1 : un agent
 
 ## Retour
  True si vacciné
  """
-isvaccinated(agent::Agent) = agent.vaccinated
-
-vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop)
-
+isvaccinated(agent::Agent) = agent.vaccinated ## État vacciné
+vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous - groupe de la population qui est vacciné
 
 # Vérifier si un agent est testé
 """
@@ -310,7 +306,7 @@ vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop)
  Vérifie si L'agent est testé
 
 ## Arguments 
- arg1 = un agent
+ arg1 : un agent
 
 ## Retour
  True si testé
@@ -330,7 +326,7 @@ tested(pop::Vector{Agent}) = filter(istested, pop)
  Cela correspond également à la période d'isolation des agents infectueux qui viennent d'être vaccinés. 
 
 ## Arguments 
- arg1 = un agent
+ arg1 : un agent
 
 ## Retour
  True si vacciné mais pas encore efficace
@@ -352,7 +348,7 @@ const Population = Vector{Agent}
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu infectueux
 
 ## Arguments 
- arg1 = la population
+ arg1 : la population
 
 ## Retour
  Tout les individus infectueux
@@ -367,7 +363,7 @@ infectious(pop::Population) = filter(isinfectious, pop)
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu sains
 
 ## Arguments 
- arg1 = la population
+ arg1 : la population
 
 ## Retour
  Tout les individus sains
@@ -381,7 +377,7 @@ healthy(pop::Population) = filter(ishealthy, pop)
  Créer un vecteur qui contient la un sous-groupe de la population totale avec tout les individu non-testés
 
 ## Arguments 
- arg1 = la population
+ arg1 : la population
 
 ## Retour
  Tout les individus non testés
@@ -401,8 +397,8 @@ untested(pop::Population) = filter(!istested, pop)
  Ils ont en fait les même coordonnés sur la lattice 
 
 ## Arguments 
- arg1 = l'agent dont l'ont veut connaitre les contacts directs
- arg 2 = la population 
+ arg1 : l'agent dont l'ont veut connaitre les contacts directs
+ arg 2 : la population 
 
 ## Retour
  Tout les agents de la population qui sont dans la même case qu'un agent 
@@ -414,7 +410,6 @@ incell(target::Agent, pop::Population) = filter(ag -> (ag.x, ag.y) == (target.x,
 # ## Gestion vaccins
 
 
-
 # Lorsque l'on administre un vaccin, il y a un délais de 2 jours avant que celui-ci devienne efficace.
 
 """
@@ -423,7 +418,7 @@ incell(target::Agent, pop::Population) = filter(ag -> (ag.x, ag.y) == (target.x,
  Initie un compte à rebourd de 2 jours ( 2 générations ) lorsqu'un agent devient vacciné ( changement de statut)
 
 ## Arguments 
- arg1 = un agent 
+ arg1 : un agent 
 
 ## Retour
  L'agent obtient le statut de "ispending" et un compte a rebour de 2 jours avant l'immunité est débuté
@@ -447,8 +442,8 @@ end
 
 
 budget_restant = 21000 ## Au départ, le budget restant est le budget total de 21 000$ 
-cout_vaccin = 17
-cout_rat = 4
+cout_vaccin = 17 ## Cout du vaccin
+cout_rat = 4 ## Cout du test RAT 
 pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clinique chaques jours. 
 
 """
@@ -457,7 +452,7 @@ pourcent = 0.01 ## pourcentage de la population qui se présente au rdv en clini
  Simule les visites à la clinique selon la stratégie de gestion adoptée, et vérifie les contraintes budgétaire pour chaques étapes du processus. 
 
 ## Arguments 
- arg1 = la population 
+ arg1 : la population 
  arg 2 : le budget restant qui se met a jour chaques jours, après chaque test ou vaccination
  arg 3 : le coût d'un test RAT
  arg 4 : le coût d'un vaccin 
@@ -527,13 +522,30 @@ end
 # Paramètes initiaux du modèle
 # Population initiale :
 
+"""
+ Population(arg1, arg2)
+
+ Génère la populaition unitiale d'agent dans le paysage 
+
+## Arguments 
+ arg1 :  Le paysage, donc la lattice 
+ arg 2 : Nombre d'agents souhaité dans la population
+
+## Retour
+Retourne une population avec un nombre d'agent distribués aléatoirement dans le paysage  
+
+"""
 function Population(L::Landscape, n::Integer)
     return rand(Agent, L, n)
 end
 
+# Afficher les informations sur la population initiale 
+
 Base.show(io::IO, ::MIME"text/plain", p::Population) = print(io, "Une population avec $(length(p)) agents")
 
-population = Population(L, 3750)      # 3750 étant la taille de la population (C2)
+# Taille de la population à l'origine de la simulation, c'est-à-dire lorsqu'il y a le premier décès.
+
+population = Population(L, 3750)      ## 3750 étant la taille de la population (C2)
 
 
 # Choisir au hasard dans la population un infecté (cas index) C5 :
@@ -541,17 +553,16 @@ population = Population(L, 3750)      # 3750 étant la taille de la population (
 rand(population).infectious = true
 
 # Nous initialisons la simulation au temps 0, et nous allons la laisser se
-# dérouler au plus 1000 pas de temps:
+# dérouler au plus 2000 pas de temps:
 
 tick = 0
 maxlength = 2000
 
-# Pour étudier les résultats de la simulation, nous allons stocker la taille de
-# populations à chaque pas de temps ( chaques jours):
 
-S = zeros(Int64, maxlength);        # série temporelle sain
-I = zeros(Int64, maxlength);        # série temporelle infectieux
-V = zeros(Int64, maxlength);
+# Objet pour stocker le nombre de morts à chaques générations 
+morts = zeros(Int64, maxlength) 
+
+
 
 # Événement d'infection : 
 # Mais nous allons aussi stocker tous les évènements d'infection qui ont lieu
@@ -574,9 +585,31 @@ events = InfectionEvent[]
 
 # ## Simulation 
 
-# La boucle tourne tant qu'il y a des infectieux et que le temps max n'est pas atteint
+# La boucle tourne tant qu'il y a des infectieux et que le temps max n'est pas atteint. 
+# Lorsqu'il n'y a plus de budget, les efforts de de gestion cesse, mais la contamination peut continuer jusqu'a 2000 générations 
+# L'argument mont clé vaccination permet de faire la simulaiton avec ou sans vaccination  
+# On fait la simulation 4 fois et stock les résultats du nombre de morts 
 
-while (length(infectious(population)) != 0) & (tick < maxlength)
+resultat_morts = Vector{Vector{Int64}}()
+
+for _ in 1:4
+
+    ## Paramètres initiaux de la simulation
+    population = Population(L, 3750) ## population initiale de 3750 individus sur le paysage
+    rand(population).infectious=true ## un agent choisit au hasard pour être malade
+    tick=0 ## temps remis a 0
+    budget_restant=21000 ## budget remis a 21000$
+    morts = zeros(Int64, maxlength) ## objet pour stocker le nombre de morts 
+   
+
+  # Objets pour stocker les séries temporelles de la simulation
+
+   S = zeros(Int64, maxlength); ## Série temporelle des agents sains
+   I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
+   V = zeros(Int64, maxlength);
+
+    
+   while (length(infectious(population)) != 0) & (tick < maxlength)
 
     ## On spécifie que nous utilisons les variables définies plus haut
     global tick, population, budget_restant
@@ -587,12 +620,18 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
 
     ## Mettre a jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours
     ## Lorsque le décompte de " pending" de 2 jour est passé, l'agent change de statut pour "vacciné""
+    ## Les agents vaccinés ne sont plus malades et ne transmettent pas l'infection.
     for agent in population
         if agent.pending && agent.vaccin_clock != 0
             agent.vaccin_clock -= 1
         elseif agent.pending && agent.vaccin_clock == 0
             agent.vaccinated = true
             agent.pending = false
+
+            ## L'agent guérit quand le vaccin est efficace
+            agent.infectious = false
+
+
         end
     end
 
@@ -614,10 +653,15 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
         end
     end
 
-    ## Changement de la survie : -1 jour pour chaque infectieux
+    ## Changement de la survie : -1 jour pour chaque infectieux, sauf ceux qu sont en isolation
     for agent in infectious(population)
+        if !agent.pending
         agent.clock -= 1
+        end
     end
+
+    ## Stocker les morts a chaques generation 
+    morts[tick] = (tick > 1 ? morts[tick-1] : 0) + count(x -> x.clock <= 0, population)
 
     ## Enlever les morts : on retire ceux qui n'ont plus de jours
     population = filter(x -> x.clock > 0, population)
@@ -626,11 +670,16 @@ while (length(infectious(population)) != 0) & (tick < maxlength)
     S[tick] = length(healthy(population))
     I[tick] = length(infectious(population))
     V[tick] = length(vaccinated(population))
+   end
+
+  ## Stocker le nombre de morts à chaques générations pour chaqune des 4 simulaitons 
+  push!(resultat_morts, morts[1:tick])
 
 end
 
-# Quand clock = 0 changer le statut pour vacciner
 
+
+ 
 # ## Analyse des résultats
 
 # ### Série temporelle
@@ -641,7 +690,7 @@ end
 S = S[1:tick];
 I = I[1:tick];
 
-# 
+# Graphique du nombre d'agent seceptible et et infectieux au  fil des générations 
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Population")
@@ -695,6 +744,28 @@ if length(events) > 0
     current_figure()
 end
 
+
+# ### Nombre de tests et nombre de vaccination par jour au cours du temps 
+
+# ### Budget restant par jours au cours du temps 
+
+# ### Comparer avec l'absence de de vaccination pour le nombre de infectueux et sain au fil du temps
+
+# Nous avons désactivé la ligne : "budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)"
+# dans la boucle de la simulation afin d'obtenir un graphique ou il n'y aurait jamais eu d'intervention de dépistage et vaccination 
+# ### Comparer avec l'absence de vaccination pour le nombre de personne infecté par agent infectueux 
+
+# Nous avons désactivé la ligne : "budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)"
+# dans la boucle de la simulation afin d'obtenir un graphique ou il n'y aurait jamais eu d'intervention de dépistage et vaccination 
+# ### Nombre de mort pour chaque simulation
+#Graphique qui supperpositionne le nombre de morts a chaques generations pour les 4 simulations
+# Random seed est désactivé pour obersver la variabililité 
+plot(resultat_morts[1])
+plot!(resultat_morts[2])
+plot!(resultat_morts[3])
+plot!(resultat_morts[4])
+
+
 # # Figures supplémentaires
 
 # Visualisation des infections sur l'axe x
@@ -712,7 +783,7 @@ scatter(t, last.(pos), color=:black, alpha=0.5)
 
 # Attention! Il faut que le code soit inclus au bon endroit (avant que les fonctions déclarées soient appellées).
 
-include("code/01_test.jl")
+# include("code/01_test.jl")
 
 # ## Une autre section
 
@@ -736,6 +807,8 @@ include("code/01_test.jl")
 # vraie vie (...article)
 
 # zones géographiques denses vs non (peu d'agents), 
+
+# Grosse supposition quand meme que le masque et la distanciation empechherait 100% des contamination ( pas tout le monde qui respecte)
 
 # réplication : durée, infection (moyenne et écart type)
 # plusieurs schénarios possibles donc intéressant car vs grosse explosion vs lente
