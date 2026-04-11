@@ -313,6 +313,7 @@ vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous - groupe de l
  """
 istested(agent::Agent) = agent.tested
 
+# Sous groupe de la population qui n'est pas testé et qui est testé 
 untested(pop::Vector{Agent}) = filter(!istested, pop)
 tested(pop::Vector{Agent}) = filter(istested, pop)
 
@@ -677,7 +678,11 @@ for _ in 1:4
 
 end
 
+# Nombre de mort finale pour les 4 itérations de simulation
 
+for (i, morts) in enumerate(resultat_morts)
+    println("Sim $i : $(morts[end]) morts en $(length(morts)) jours")
+end
 
  
 # ## Analyse des résultats
