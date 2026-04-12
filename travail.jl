@@ -4,7 +4,7 @@
 # auteurs:
 #    - nom: Bhandari
 #      prenom: Snehal
-#      matricule: XXXXXXXX
+#      matricule: 20279267
 #      github: snehal12b
 #    - nom: Fournier
 #      prenom: Rosanne
@@ -16,70 +16,98 @@
 #      github: lauriannelafontaine
 # ---
 
+# # Résumé
+
+# Cette étude utilise un modèle de simulation basé sur les agents pour analyser la propagation d’une maladie infectieuse dans un contexte où les ressources
+# de santé sont limitées. Le pathogène simulé est très transmissible, asymptomatique et entraîne la mort en l’absence d’intervention. La transmission se fait
+# par contact direct dans une grille spatiale, où les individus se déplacent de façon aléatoire.
+# Pour représenter des contraintes réalistes du système de santé,
+# seule une petite proportion de la population (1 %) est testée chaque jour, ce qui correspond à une capacité clinique limitée. Les individus sont dépistés à
+# l’aide d’un test rapide imparfait et peuvent être vaccinés s’ils sont détectés comme infectieux, selon le budget disponible. Le vaccin devient pleinement
+# efficace après un court délai, pendant lequel les individus ne participent plus à la transmission.
+# L’objectif est d’évaluer l’effet d’une stratégie de vaccination ciblée sur la mortalité et la propagation de l’épidémie, en tenant compte de contraintes
+# budgétaires et biologiques. Les résultats sont comparés à un scénario sans intervention, et la variabilité entre simulations est analysée. Les résultats
+# montrent que la stratégie réduit la propagation à long terme, mais reste limitée par le dépistage aléatoire, qui ne permet de détecter qu'un faible nombre
+# d'individus infectés, ce qui réduit le nombre de vaccinations effectives.
+
 # # Introduction 
 
-# Les maladies infectieuses sont l'une des principales menaces pour la santé
-# publique mondiale . Malgré les progrès significatifs des systèmes de santé,
-# des infections comme la Covid-19 ont montré à quel point ces maladies peuvent
-# se propager rapidement, entraîner l'isolement social et provoquer de nombreux décès.
-# (@cascella2026covid) La transmission de virus par goutelettes, contacte direct ou voyage
-# facilite leur propagation dans une population, et leur nature invisible rend la précention
-# difficile sans interventions ciblées. La vaccination est l'une des mesures les plus efficaces
-# pour réduire les risques d'infection et protéger la population. En effet, elle a permis
-# d'éviter plusieurs millions de décès chaque année grâce à la prévention de maladies graves
-# comme la rougeole, le tétanos ou le polio (@ginglen2026immunization).
+# ## Contexte des maladies infectieuses et importance de la vaccination
 
-# Dans certaines situations épidémiologiques, les individus infectés peuvent
-# demeurer asympotomatiques tout en étant capables de transmettre la maladie.
-# Cette transmission silencieuse complique l'identification des cas infectieux
-# et limite l'efficacité des approches reposant uniquement sur les symptômes.
-# Les modèles épidémiologiques qui impliquent des individus asymptomatiques 
-# montrent que ces derniers jouent un rôle clé dans la dynamique de propagation
+# Les maladies infectieuses sont l'une des principales menaces pour la santé publique mondiale . Malgré les progrès significatifs des systèmes de santé,
+# des infections comme la Covid-19 ont montré à quel point ces maladies peuvent se propager rapidement, entraîner l'isolement social et provoquer de nombreux décès.
+# (@cascella2026covid) La transmission de virus par goutelettes, contacte direct ou voyage facilite leur propagation dans une population, et leur nature invisible 
+# rend la prévention difficile sans interventions ciblées. La vaccination est l'une des mesures les plus efficaces pour réduire les risques d'infection et protéger
+# la population. En effet, elle a permis d'éviter plusieurs millions de décès chaque année grâce à la prévention de maladies graves comme la rougeole, le tétanos
+#ou le polio (@ginglen2026immunization).
+
+# Dans certaines situations épidémiologiques, les individus infectés peuvent demeurer asympotomatiques tout en étant capables de transmettre la maladie.
+# Cette transmission silencieuse complique l'identification des cas infectieux et limite l'efficacité des approches reposant uniquement sur les symptômes.
+# Les modèles épidémiologiques qui impliquent des individus asymptomatiques montrent que ces derniers jouent un rôle clé dans la dynamique de propagation
 # et doivent être pris en compte dans les stratégies de contrôle (@kuddus2025modelling).
 
-# Dans ce contexte, le dépistage devient un outil essentiel pour détecter les individus infectieux.
-# Toutefois, les tests diagnostiques présentent des limites de sensibilité, ce qui introduit
-# une incertitude dans l'estimation de la prévalence réelle et dans la prise de décision en
-# santé publique. Parallèlement, la vaccination demeure une intervention majeure pour réduire
-# la transmission et la mortalité, en particulier lorsqu'elle est utilisée de manière
-# ciblée et optimisée (@yakob2025age).
+# Dans ce contexte, le dépistage devient un outil essentiel pour détecter les individus infectieux. Toutefois, les tests diagnostiques présentent des limites de
+# sensibilité, ce qui introduit une incertitude dans l'estimation de la prévalence réelle et dans la prise de décision en santé publique. Parallèlement, la vaccination
+# demeure une intervention majeure pour réduire la transmission et la mortalité, en particulier lorsqu'elle est utilisée de manière ciblée et optimisée (@yakob2025age).
 
-# Afin d'évaluer l'efficacité de différentes stratégies d'intervention, les modèles de
-# simulation, notamment ls modèles agents, sont largement utilisés por reproduire la propagation
-# des maladies infectieuses et teste l'impact combiné du dépistage, de l'isolement et de la vaccination.
-# Ces approches permettent d'explorer différentes allocations de ressources et d'identifier des stratégies
-# optimales de contrôle (@stephenson2020comparing).
+# Dans certains contextes, notamment en milieu rural ou dans de petites cliniques, la capacité quotidienne de prise en charge est limitée en raison de la disponibilité
+# restreinte du personnel infirmier et des ressources de santé, ce qui impose une contrainte sur le nombre d’individus pouvant être testés chaque jour (@who2021who). 
 
-# Dans ce travail, nous utilisons un modèle de simulation basé sur les agents
-# pour représenter la propagation d'une maladie infectieuse dans une population qui
-# est initialement saine. La maladie simulée possède une transmision par contact
-# direct, une durée d'infection fixe et entraîne une mortalité complète en absence
-# d'ntervention. Un vaccin entièrement efficace est disponible, mais il y a un
-# délai de deux générations (jours) après son administration avant que l'immunité ne
-# soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des
-# contraintes budgétaires, où les ressources peuvent être allouées soit au
-# dépistage par des tests antigéniques rapides, soit à la vaccination des individus.
+# ## Modélisation épidémiologique
 
-# L'objectif de ce travail est donc de développer et d'évaluer une stratégie de
-# vaccination permettant de réduire la mortalité associée à l'épidémie, tout en
-# respectant les contraintes biologiques et budgétaires imposées par le modèle. 
+# Afin d'évaluer l'efficacité de différentes stratégies d'intervention, les modèles de simulation, notamment ls modèles agents, sont largement utilisés pour reproduire la
+# propagation des maladies infectieuses et teste l'impact combiné du dépistage, de l'isolement et de la vaccination. Ces approches permettent d'explorer différentes allocations
+# de ressources et d'identifier des stratégies optimales de contrôle (@stephenson2020comparing).
 
+# Dans ce travail, nous utilisons un modèle de simulation basé sur les agents pour représenter la propagation d'une maladie infectieuse dans une population qui est initialement
+# saine. Ceci est une approche classique pour étudier la dynamique d'émergence d'un agent pathogène en absence d'immunité préexistante (@keeling2026epidemiologists). 
+# La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et entraîne une mortalité complète en absence d'ntervention. Cela permet de reproduire 
+# les dynamiques observées dans les modèles et agents largement utilisés en épidémiologie (@eubank2004modelling). La présence d'individus asymptomatiques représente également une
+# contrainte réaliste, puisque plusieurs études ont démontré que la transmission silencieuse joue un rôle important dans la propagation des infections respiratoires, notamment lors
+# de la pandémie de COVID-19 (@he2020temporal). Dans ce contexte, l'utilisation des tests diagnostiques imparfaits reflète les limites réelles du dépistage, où la sensibilité incomplète
+# de tests influence l'estimation de la prévalence et les décisions d'intervention (@larremore2021test). Un vaccin entièrement efficace est disponible, mais il y a un délai de deux
+# générations (jours) après son administration avant que l'immunité ne soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les
+# ressources peuvent être allouées soit au dépistage par des tests antigéniques rapides, soit à la vaccination des individus.
+
+# Le problème biologique étudié porte alors sur la dynamique de propagation d’un agent infectieux asymptomatique dans une population naïve, où la transmission silencieuse
+# et les limitations diagnostiques compliquent le contrôle de l’épidémie.
+
+# L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en respectant les contraintes
+# biologiques et budgétaires imposées par le modèle. Nous devons donc (i) mesurer l'efficacité de la campagne, via la réduction de mortalité comparée à l'absence d'intervention, et (ii)
+# estimer le coût total de la campagne. 
 # # Présentation du modèle
 
+# ## Contexte épidémiologique simulé
+
 # La simulation modélise la propagation d’une maladie infectieuse très virulente, similaire à Ebola, causant la mort 21 jours après l’infection.
-# La population initiale est entièrement naïve (ne possède aucune immunité) composée de 3750 individus, répartis aléatoirement sur une lattice
-# bidimensionnelle de -50 à 50 sur chaque axe. Un individu est choisi au hasard pour être infecté au début de la simulation, représentant le premier cas.
-# Les agents (individus) se déplacent quotidiennement sur la lattice configurée en torus, de sorte que ceux qui atteignent les bords réapparaissent de l’autre côté.
+# La population initiale est entièrement naïve (ne possède aucune immunité) composée de 3750 individus. Un individu est choisi aléatoirement au début de la simulation
+# représentant le premier cas.
+
+# ## Environnement spatial et déplacement des agents
+
+# Les individus sont répartis aléatoirement sur une lattice bidimensionnelle de -50 à 50 sur chaque axe. Les agents (individus) se déplacent quotidiennement sur la
+# lattice configurée en torus, de sorte que ceux qui atteignent les bords réapparaissent de l’autre côté.
+
+# ## Transmission de l'infection
+
 # Les individus infectieux ont une probabilité de 0,4 de transmettre l’infection à leurs voisins dans la même cellule, représentant le contact direct dans la même
-# case de la lattice.Les individus infectieux sont asymptomatiques et ne peuvent être détectés qu’à partir d’un test antigénique rapide (RAT). Ce test possède une
+# case de la lattice. La durée de l,infection est fixe et entraîne systématiquement la mort après 21 jours en absence d'intervention.
+
+# ## Détection des individus infectieux
+
+# Les individus infectieux sont asymptomatiques et ne peuvent être détectés qu’à partir d’un test antigénique rapide (RAT). Ce test possède une
 # précision de 95 %, ce qui implique un taux de faux négatifs de 5 %, et il ne permet pas de connaître depuis combien de temps un individu est infectieux.
-# La prévalence réelle de la maladie ne peut donc être estimée que par des tests. Chaque jour, un maximum de 1 % des individus non testés est sélectionné pour un
-# rendez-vous (RDV) à la clinique, pour tenir compte des contraintes logistiques d’accueil. Les rendez-vous sont interrompus dès que le budget total de 21 000 $
-# est épuisé, avec un coût de 4 $ par test et 17 $ par dose de vaccin. Le modèle intègre une stratégie de vaccination ciblée, d'abord, les individus testés positifs
-# au RAT sont immédiatement vaccinés si le budget le permet. Ensuite, la vaccination déclenche une période transitoire de 2 générations, durant laquelle les agents
-# sont considérés en quarantaine/isolation pour réduire leur contribution à la transmission. Après cette période, les individus deviennent complètement immunisés,
-# protégés contre l’infection, la transmission et la mortalité. Cette approche permet d’évaluer l’efficacité de la campagne de vaccination en comparant la mortalité
-# totale avec intervention à celle observée en absence de contrôle, ainsi que le coût total des tests et vaccinations.
+# Par conséquent, la prévalence réelle de la maladie ne peut donc être estimée que par des résultats de dépistage. 
+
+# ## Contraintes opérationnelles et budgétaires
+
+# Les rendez-vous sont interrompus dès que le budget total de 21 000 $ est épuisé, avec un coût de 4 $ par test et 17 $ par dose de vaccin.
+# Le modèle intègre une stratégie de vaccination ciblée, d'abord, les individus testés positifs au RAT sont immédiatement vaccinés si le budget le permet. 
+
+# ## Vaccination dans le modèle
+
+# Un vaccin entièrement efficace est disponible dans la simulation. Après son administration, une période transitoire de deux générations (jours) est nécessaire
+# avant l'acquisition complète de l'immunité. Une fois immunisés, les individus ne peuvent plus être infectés, transmettre la maladie ni mourir de l'infection.
 
 # # Stratégie de vaccination
 
@@ -87,38 +115,24 @@
 # et opérationnelles imposées par le modèle. Puisque les individus infectieux sont asymptomatiques et que la prévalence réelle de la maladie ne peut être connue sans 
 # dépistage, une clinique simulée reçoit quotidiennement un nombre limité d’individus correspondant à 1 % de la population non testée. Cette sélection aléatoire vise
 # à reproduire une capacité de santé publique réaliste où les ressources diagnostiques sont limitées, tout en permettant une estimation indirecte de la circulation de
-# l’infection dans la population. Lors de leur visite, les individus sont d’abord soumis à un test antigénique rapide (RAT), possédant une sensibilité de 95 %.
-# Les individus détectés comme infectieux sont immédiatement vaccinés si le budget disponible le permet. La vaccination déclenche une période transitoire de deux
-# générations durant laquelle les agents sont considérés en attente d’immunité et placés en isolation fonctionnelle, réduisant ainsi leur contribution à la transmission
-# pendant que la protection vaccinale s’établit. Une fois que ce délai soit écoulé, les individus deviennent complètement immunisés. Ainsi, ils ne peuvent plus être
-# infectés, transmettre la maladie ni mourir de l’infection. Cette stratégie vise à interrompre précocement les chaînes de transmission en identifiant et immunisant
-# prioritairement les individus déjà infectieux plutôt qu’en vaccinant massivement la population au hasard. Le choix d’allouer les ressources d’abord au dépistage
-# permet d’optimiser l’utilisation du budget disponible en dirigeant les doses vaccinales vers les individus ayant la plus forte probabilité de propager l’épidémie.
-# L’efficacité de la campagne est ensuite évaluée en comparant la mortalité totale obtenue avec l'intervention à celle observée en absence de contrôle, tout en
-# considérant le coût total engagé pour les tests et la vaccination.
+# l’infection dans la population.
 
+# Avant chaque intervention, le budget est vérifié afin de déterminer si l'action peut être réalisée. Lors de leur visite, les individus sont d’abord soumis à un test 
+# antigénique rapide (RAT), possédant une sensibilité de 95 %, uniquement si les ressources financières permettent l'administration du teste. Si le budget devient insuffisant,
+# aucune nouvelle intervention n'est effectuée.
+
+# Les individus détectés comme infectieux sont immédiatement vaccinés si le budget disponible le permet.
+# La vaccination déclenche une période transitoire de deux générations durant laquelle les agents sont considérés en attente d’immunité et placés en isolation fonctionnelle,
+# réduisant ainsi leur contribution à la transmission pendant que la protection vaccinale s’établit. Une fois que ce délai soit écoulé, les individus deviennent complètement
+# immunisés. Ainsi, ils ne peuvent plus être infectés, transmettre la maladie ni mourir de l’infection.
+
+# Cette stratégie vise à réduire la propagation de l'épidémie en combinant le dépistage d'un sous-ensemble de la population, puis les individus infectés détectés sont pris en
+# charge par vaccination et placés en phase transitoire, ce qui permet de limiter leur conrtibution à la transmission. Cette approche permet d'optimiser l'utilisation du budget
+# en priorisant les individus identifiés comme infectés via le processus de test.
+
+# L’efficacité de la campagne est ensuite évaluée en comparant la mortalité totale obtenue avec l'intervention à celle observée en absence de contrôle, tout en considérant
+# le coût total engagé pour les tests et la vaccination.
 # # Implémentation
-
-# La simulation a été réalisée en utilisant un modèle agent basé, où chaque agent représente un individu de la population. La population initiale de 3750 individus est 
-# répartie sur une lattice bidimensionnelle configurée en torus, ce qui permet aux agents de se déplacer continuellement sans rencontrer de bords. Chaque agent possède
-# des attributs décrivant son état de santé, son statut vaccinal et le temps depuis infection ou vaccination. La boucle principale de la simulation est exécutée génération
-# par génération. À chaque pas :
-
-# 1. Les agents se déplacent aléatoirement sur la lattice.
-
-# 2. Les interactions locales sont évaluées, donc chaque agent infectieux a une probabilité de 0,4 de transmettre la maladie à ses voisins immédiats.
-
-# 3. Le dépistage est effectué selon la capacité clinique maximale (1 % des individus non testés par jour), en respectant le budget restant. Les agents sélectionnés passent
-# le test antigénique rapide (RAT), et les résultats sont simulés avec une précision de 95 %.
-
-# 4. Les agents testés positifs sont vaccinés si le budget le permet, et entrent en quarantaine fonctionnelle pendant la période transitoire de 2 générations.
-
-# 5. Les statistiques sont mises à jour à chaque génération : nombre d’infections, de décès, de vaccinations, tests effectués, et coût cumulé.
-
-# La simulation s’arrête soit lorsque tous les agents ont été infectés ou immunisés, soit lorsque le budget est épuisé. Les résultats finaux sont collectés pour comparer
-# la mortalité avec et sans intervention, et pour évaluer l’efficacité et le coût total de la campagne de vaccination.
-
-# # Implémentation : code pour le modèle
 
 # ## Packages nécessaires
 
@@ -727,7 +741,7 @@ stairs!(ax, 1:tick, nb_vaccins[1:tick], label="Vaccins", color=:red)
 axislegend(ax)
 current_figure()
 
-# _Figure 3._ Nombre de tests RAT et de vaccins par au cours des générations 
+# _Figure 3._ Nombre de tests RAT et de vaccins au cours des générations 
 
 # Ici, le nombre de vaccins est très faible contrairement au nombre de dépistage. Il y a une très grande augmentation
 # des RAT vers 200 générations et ensuite un déclin. Dans les environ de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
@@ -761,28 +775,28 @@ current_figure()
 # Même graphique que la figure 5, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
 # dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
 
-# ### _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
+#  _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
 
-# Pour les deux figure, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts.
+# Pour les deux figures, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts.
 # # Discussion
 
-# Notre stratégie de vaccination ciblé testait 1% des individus non-testés à chaque jours au test RAT et ceux étant positifs 
-# étaient vaccinés. La population était testée au hasard pour représenter les ressources limités de la santé publique d’un 
+# Notre stratégie de vaccination ciblée testait 1% des individus non-testés à chaque jours au test RAT et ceux étant positifs 
+# étaient vaccinés. La population était testée au hasard pour représenter les ressources limitées de la santé publique d’un 
 # petit village. En revanche, le choix de vacciner les individus positifs était pour les guérir et limiter la propagation de 
 # l’infection. Nous avons choisit de mettre nos agents vaccinés en « isolation », pour éviter de continuer la propagation le 
 # temps que le vaccin fasse effet. Les agents peuvent encore bouger sur la lattice à chaque génération, mais on considère qu’ils
-# ont un masque et respecte une distance sociale (mesures de sécurités).
+# ont un masque et respectent une distance sociale (mesures de sécurités).
 
-# Cette stratégie ne serait surment pas la plus efficace dans la vraie vie, mais comme nous sommes dans une simulation fictive
+# Cette stratégie ne serait sûrement pas la plus efficace dans la vraie vie, mais comme nous sommes dans une simulation fictive
 # avec peu de moyens, c’était la meilleure option. Cependant, pour améliorer le modèle, il aurait été pertinent de vacciner les
-# agents à un certain diamètre d’un individu ayant testé positif au RAT. Aussi, il aurait aussi intéressant de voir un modèle où 
+# agents à un certain diamètre d’un individu ayant testé positif au RAT. Aussi, il aurait aussi été intéressant de voir un modèle où 
 # on vaccine le plus de monde possible et voir comment ça évolue, de voir comment l’infection aurait persisté dans le temps.
 
 # ## Comparaison avec / sans campagne
 
 # Avec la figure 1, il est possible d’observer que la chute importante de la population est dû au temps avant que le vaccin devienne 
-# efficace pour la population. En effet, pour être efficace à grande échelle, ça prend un certain délai avant que le corps développement
-# une réponse immunitaire peu de temps (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
+# efficace pour la population. En effet, pour être efficace à grande échelle, ça prend un certain délai avant que le corps développe
+# une réponse immunitaire en peu de temps (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
 # l’absence d’infectés. Notre stratégie de vaccination fonctionne à long terme, mais il reste seulement environ 24% de la population
 #  initiale après un peu plus d’un an de simulation.
 
@@ -793,47 +807,53 @@ current_figure()
 # 1% de détectés à chaque jours est trop petit pour assurer l’effet voulu de sauver nos individus et d’arrêter la propagation de l’infection.  
 
 # ## Gestion  du budget
-# Avec la figure 3, on observe qu’il y a eu beaucoup plus de dépistages RAT que de vaccins administrés, car la grande majorité du peu de personnes 
+# Avec la figure 3, on observe qu’il y a eu beaucoup plus de dépistages RAT que de vaccins administrés, car la grande majorité de personnes 
 # testées n’était pas malade. Cela explique le faible impact de notre campagne de vaccination. De plus, la campagne de dépistage se poursuit jusqu’à 
 # un peu plus de 600 générations, où il y a un arrêt total de la campagne. Cette figure n’est pas cohérente avec les figures 1 et 2 où la fin des infectés 
 # est vers 350 générations, donc il ne devrait plus avoir de vaccins. Ça peut être expliqué par le faible budget restant, alors il y a encore des dépistages
 # qui se font puisqu’il reste du budget et une erreur au niveau de notre code.
 
-# Avec la figure 4 on voit une stabilisation du budget vers 300 générations à environ 1500$. Cette stabilisation est surement dû au fait que l’épidémie
-# se termine vers 350 générations, alors plus besoin de vacciner les individus. On voit que le budget n’était pas un facteur limitant et que l’on aurait pu 
+# Avec la figure 4 on voit une stabilisation du budget vers 300 générations à environ 1500$. Cette stabilisation est sûrement dû au fait que l’épidémie
+# se termine vers 350 générations, alors on a plus besoin de vacciner les individus. On voit que le budget n’était pas un facteur limitant et que l’on aurait pu 
 # améliorer notre campagne de vaccination en conséquence. Ce changement aurait pu permettre de vacciner plus d’individus, de minimiser les morts, de dépister 
-#plus de 1% de la population ou bien de diminuer le temps de l’épidémie.
+# plus de 1% de la population ou bien de diminuer le temps de l’épidémie.
 
 # ## Variabilité 
-# Les maladies infectieuses sont un danger pour la population, nous l’avons vu dans cette simulation avec comment un agent infecté à la génération 1 peut causé
+# Les maladies infectieuses sont un danger pour la population, nous l’avons vu dans cette simulation avec comment un agent infecté à la génération 1 peut causer
 # la mort de plusieurs autres même avec vaccination et diminuer la taille de la population de 76% en environ un an. 
 
 # On remarque qu’avec les 10 simulations avec vaccination, la mortalité moyenne finale est de 2 867 morts (+/- 72) atteinte en moyenne après 473 générations 
 # (+/- 54), laissant environ 883 survivants, soit 24 % de la population initiale. La faible variabilité observée, avec un coefficient de variation d'environ 
-# 2,5 % pour la mortalité et 11 % pour la durée, témoigne d'une forte reproductibilité avec vaccination. La forte reproductibilité peut être dû par 
+# 2,5 % pour la mortalité et 11 % pour la durée, témoigne d'une forte reproductibilité avec vaccination. La forte reproductibilité peut être dû par...
+# Cette faible variabilité peut s'expliquer par la contrainte du dépistage systématique et de la vaccination ciblée, qui stabilise rapidement la dynamique
+# épidémique en réduisant les fluctuations aléatoires de transmission.
 
-# En revanche, les 10 essais de la simulation sans vaccination nous avons une mortalité moyenne est de 2 659 morts (+/- 935) atteinte en 400 générations (+/- 139). 
+# En revanche, après les 10 essais de la simulation sans vaccination nous avons une mortalité moyenne est de 2 659 morts (+/- 935) atteinte en 400 générations (+/- 139). 
 # Cette variabilité plus élevée est expliquée par une donnée extrême : une simulation où un seul individu est mort en 21 générations. C’est un cas très rare, mais 
-# possible étant donné la grande lattice de 10 000 cases pour 3750 individus. Le cas index, soit premier individu recevant au hasard l’infection à la première génération,
-# peut ne jamais rencontrer d’autres individus susceptibles, donc l’épidémie se termine avec sa mort. Il est possible d’exclure cette donnée extrême et la mortalité moyenne 
-# sans vaccination se rapproche de celle observée avec vaccination, avec environ 796 survivants. Alors, la variabilité entre les simulations devient comparable.
+# possible étant donné la grande lattice de 10 000 cases pour 3750 individus. Le cas index, soit le premier individu recevant au hasard l’infection à la première génération,
+# peut ne jamais rencontrer d’autres individus susceptibles, donc l’épidémie se termine avec sa mort. De plus, la nature stochastique des contacts dans le modèle agent-basé
+# peut expliquer la forte variabilité, car les interactions entre individus sont aléatoires et dépendent de leur position spatiale. Ainsi, l'existence de l'épidémie est très
+# sensible au cas index et aux premiers contacts infectieux.
+
+# Il est possible d'exclure cette donnée extrême et la mortalité moyenne sans vaccination se rapproche de celle observée avec vaccination, avec environ 796 survivants.
+# Alors, la variabilité entre les simulations devient comparable.
 
 # ## Limites
 
 # Les individus infectés sont asymptomatiques, alors nous pouvons seulement détecté l'infection avec un test de détection antigénique
 # rapide (RAT). Cependant, les tests de détections ne sont pas parfait et ont un 5% de faux négatifs. En effet, il est commun de ne pas
 # avoir de tests 100% efficaces et c’est réaliste. Par exemple, avec le test rapide de détection au Covid-19, on observe une sensibilité 
-# entre 70 % et 90 % chez les agents symptomatiques, mais diminue à moins de moins de 50 % chez les asymptomatiques (@fouzas2021). Dans 
+# entre 70 % et 90 % chez les agents symptomatiques, mais diminue à moins de 50 % chez les asymptomatiques (@fouzas2021). Dans 
 # notre simulation notre 5% de faux négatifs est considéré bon contrairement à celui présenté précédemment, voir un peu trop irréaliste.
 
-# Pour la prévention, les vaccins 100% efficaces, seulement après 2 jours. Dans cette simulation c’est très utile, mais ce n'est pas très 
-# réaliste de la vraie vie, où le système immunitaire des individus varient. Par exemple, avec le vaccins contre la Covid-19 l’efficacité
-# variaient entre 50-100% selon la variante du vaccin et du virus (@higdon2022). Aussi, avec l’Ebola, l’immunisation était significative 
+# Pour la prévention, les vaccins sont 100% efficaces, seulement après 2 jours. Dans cette simulation c’est très utile, mais ce n'est pas très 
+# réaliste de la vraie vie, où le système immunitaire des individus varie. Par exemple, avec les vaccins contre la Covid-19, l’efficacité
+# variait entre 50-100% selon la variante du vaccin et du virus (@higdon2022). Aussi, avec l’Ebola, l’immunisation était significative 
 # qu’après 10 jours ou plus (@henao2017).
 
 # Ici, l’infection est fatale sans vaccination. Par contre, dans la réalité et avec la médecine d’aujourd’hui, c’est très rare d’avoir 
 # une maladie incurable provoquant la mort en 21 jours. En effet, en comparaison au VIH, dans les années 1980, la maladie était fatale 
-# après 1 à 2 ans. Aujourd’hui, avec des traitements comme la thérapie antirétrovirale, les personnes infectés se rapproche d’une expérience 
+# après 1 à 2 ans. Aujourd’hui, avec des traitements comme la thérapie antirétrovirale, les personnes infectées se rapprochent d’une expérience 
 # de vie normale (@trickey2023).
 
 # De plus, dans la réalité, il y a des zones géographiques plus denses avec plus de gens au même endroit comme à l’hôpital, en ville, au 
@@ -847,8 +867,8 @@ current_figure()
 # il est impossible que dans la population tous les individus respectent ces conditions. Aussi, il a été démontré que l’efficacité du port du
 #  masque en conditions réelles est inférieure à son efficacité théorique (@yang2024). Notre modèle surestime l'effet protecteur de l'isolation des agents vaccinés.
 
-# Nous aurions pu aborder pleins d’autres limites comme dans une vraie pandémie, les mesures sont déclenchées plus tard et non après le premier 
-# décès puisque la maladie à ce stade est encore inconnu. Ou bien, que notre vaccin est une antidote et non une protection future, même qu’en 
+# Nous aurions pu aborder pleins d’autres limites comme dans une vraie pandémie où les mesures sont déclenchées plus tard et non après le premier 
+# décès puisque la maladie à ce stade est encore inconnue. Ou bien, que notre vaccin est une antidote et non une protection future, même qu’en 
 # réalité on peut se créer nous même notre propre immunité suite à l’infection.
 
 # Comme la réalité est plus complexe qu’une simulation, c’est normal que la simulation ne prend pas en compte tous ces enjeux. En revanche, 
