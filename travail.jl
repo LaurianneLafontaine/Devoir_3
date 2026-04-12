@@ -12,7 +12,7 @@
 #      github: rosannefournier
 #    - nom: Lafontaine
 #      prenom: Laurianne
-#      matricule: XXXXXXXX
+#      matricule: 20275756
 #      github: lauriannelafontaine
 # ---
 
@@ -135,8 +135,8 @@ using StatsBase
 using Random
 
 # Initialisation de nombre aléatoire       
-
-#Random.seed!(2045)
+# Utilisé seulement pour les figures présentés lors de la présentation orale, pour que les résultats soit reproductibles 
+# Random.seed!(2045)
 
 # Pour donner un identifiant unique aux agents
 
@@ -191,9 +191,8 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 # fonction:
 
 """
-    Random.rand(arg1, arg2, arg3)
-
-    Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
+Random.rand(arg1, arg2, arg3)
+ Génère des agents avec des position aléatoires dans le paysage, qui est une lattice dont la dimention se trouve entre x, y min etx, y max
 
 ## Arguments 
 arg1 : Le type d'agent généré
@@ -560,9 +559,23 @@ tick = 0
 maxlength = 2000
 
 
-# Objet pour stocker le nombre de morts à chaques générations 
+# Vecteur pour stocker le nombre de morts à chaques générations d'une simulation
 morts = zeros(Int64, maxlength) 
 
+# Liste des résultats des vecteurs de morts pour les 4 simulations 
+resultat_morts = Vector{Vector{Int64}}()
+
+# Pour stocker le nombre de test et vaccin a chaques generations 
+nb_tests = zeros(Int64, maxlength); ## objet pour stoker le nombre de tests effectués 
+nb_vaccins = zeros(Int64, maxlength); ## objet pour stocker le nomre de vaccin 
+
+# Pour stocker les séries temporelles de la simulation
+S = zeros(Int64, maxlength); ## Série temporelle des agents sains
+I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
+V = zeros(Int64, maxlength);
+
+# Pour stocker le budget au fil des jours
+budget_par_jour = zeros(Int64, maxlength); 
 
 
 # Événement d'infection : 
@@ -588,36 +601,32 @@ events = InfectionEvent[]
 
 # La boucle tourne tant qu'il y a des infectieux et que le temps max n'est pas atteint. 
 # Lorsqu'il n'y a plus de budget, les efforts de de gestion cesse, mais la contamination peut continuer jusqu'a 2000 générations 
-# L'argument mont clé vaccination permet de faire la simulaiton avec ou sans vaccination  
-# On fait la simulation 4 fois et stock les résultats du nombre de morts 
+# Pour faire la simulation sans vaccination, mettre un # devant la ligne budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)
+# On fait la simulation 10 fois et stock les résultats du nombre de morts 
 
-resultat_morts = Vector{Vector{Int64}}()
 
-for _ in 1:4
+for _ in 1:10
 
     ## Paramètres initiaux de la simulation
     population = Population(L, 3750) ## population initiale de 3750 individus sur le paysage
     rand(population).infectious=true ## un agent choisit au hasard pour être malade
     tick=0 ## temps remis a 0
-    budget_restant=21000 ## budget remis a 21000$
     morts = zeros(Int64, maxlength) ## objet pour stocker le nombre de morts 
-   
-
-  # Objets pour stocker les séries temporelles de la simulation
-
-   S = zeros(Int64, maxlength); ## Série temporelle des agents sains
-   I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
-   V = zeros(Int64, maxlength);
-
+    
+    nb_tests = zeros(Int64, maxlength); ## objet pour stoker le nombre de tests effectués 
+    nb_vaccins = zeros(Int64, maxlength); ## objet pour stocker le nomre de vaccin 
+    S = zeros(Int64, maxlength); ## Série temporelle des agents sains
+    I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
+    V = zeros(Int64, maxlength);
+    budget_par_jour = zeros(Int64, maxlength); 
+    budget_restant = 21000 ## Budget restant au debut est le budget total
     
     while (length(infectious(population)) != 0) & (tick < maxlength)
 
-    ## On spécifie que nous utilisons les variables définies plus haut
-    global tick, population, budget_restant
-
     tick += 1 # changement dans les décompte de 1 jours à chaques itération
 
-    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) # Résultat du budget restant selon ce les rdv de la journée
+    ## Mettre un # devant la ligne suivante pour faire la simulation sans vaccination 
+    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
 
     ## Mettre a jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours
     ## Lorsque le décompte de " pending" de 2 jour est passé, l'agent change de statut pour "vacciné""
@@ -639,7 +648,7 @@ for _ in 1:4
     ## Mouvement : les agents bougent d'une case
     ## Les agents qui sont en isolation bouge quand même, mais on considère qu'ils ont des mesures sanitaires ( ex : porte un masque)
     for agent in population
-        move!(agent, L; torus=false)
+        move!(agent, L; torus= true)
     end
 
     ## Infection : les infectieux ont 40% d'infecter un voisin sain au hasard (C3)
@@ -671,14 +680,18 @@ for _ in 1:4
     S[tick] = length(healthy(population))
     I[tick] = length(infectious(population))
     V[tick] = length(vaccinated(population))
-   end
 
-  ## Stocker le nombre de morts à chaques générations pour chaqune des 4 simulaitons 
-  push!(resultat_morts, morts[1:tick])
+    ## Stocker 
+    budget_par_jour[tick] = budget_restant
+
+    end    
+    
+   ## Stocker le nombre de morts à chaques générations pour chaqune des 10 simulaitons 
+   push!(resultat_morts, morts[1:tick])
 
 end
 
-# Nombre de mort finale pour les 4 itérations de simulation
+# Nombre de mort finale pour les 10 itérations de simulation
 
 for (i, morts) in enumerate(resultat_morts)
     println("Sim $i : $(morts[end]) morts en $(length(morts)) jours")
@@ -731,28 +744,20 @@ ax = Axis(f[1, 1]; xlabel="Nombre d'infections", ylabel="Nombre d'agents")
 scatterlines!(ax, [get(nb_inxfn, i, 0) for i in Base.OneTo(maximum(keys(nb_inxfn)))], color=:black)
 f
 
-# ### Hotspots
-
-# Nous allons enfin nous intéresser à la propagation spatio-temporelle de
-# l'épidémie. Pour ceci, nous allons extraire l'information sur le temps et la
-# position de chaque infection:
-
-if length(events) > 0
-    t = [event.time for event in events]
-    pos = [(event.x, event.y) for event in events]
-
-    f = Figure()
-    ax = Axis(f[1, 1]; aspect=1, backgroundcolor=:grey97)
-    hm = scatter!(ax, pos, color=t, colormap=:navia, strokecolor=:black, strokewidth=1, colorrange=(0, tick), markersize=6)
-    Colorbar(f[1, 2], hm, label="Time of infection")
-    hidedecorations!(ax)
-    current_figure()
-end
-
 
 # ### Nombre de tests et nombre de vaccination par jour au cours du temps 
+f = Figure()
+ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Nombre")
+stairs!(ax, 1:tick, nb_tests[1:tick], label="Tests", color=:black)
+stairs!(ax, 1:tick, nb_vaccins[1:tick], label="Vaccins", color=:red)
+axislegend(ax)
+current_figure()
 
-# ### Budget restant par jours au cours du temps 
+# ### Budget restant par jours au cours du temps
+f = Figure()
+ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Budget restant ")
+stairs!(ax, 1:tick, budget_par_jour[1:tick], color=:black)
+current_figure()
 
 # ### Comparer avec l'absence de de vaccination pour le nombre de infectueux et sain au fil du temps
 
@@ -765,21 +770,14 @@ end
 # ### Nombre de mort pour chaque simulation
 #Graphique qui supperpositionne le nombre de morts a chaques generations pour les 4 simulations
 # Random seed est désactivé pour obersver la variabililité 
-plot(resultat_morts[1])
-plot!(resultat_morts[2])
-plot!(resultat_morts[3])
-plot!(resultat_morts[4])
+f = Figure()
+ax = Axis(f[1, 1]; xlabel=" jours", ylabel="morts")
 
+for (i, D) in enumerate(resultat_morts)
+    lines!(ax, 1:length(D), D, color=:steelblue, alpha=0.4)
+end
 
-# # Figures supplémentaires
-
-# Visualisation des infections sur l'axe x
-
-scatter(t, first.(pos), color=:black, alpha=0.5)
-
-# et y
-
-scatter(t, last.(pos), color=:black, alpha=0.5)
+current_figure()
 
 # Tous les fichiers dans le dossier `code` peuvent être ajoutés au travail final. C'est par exemple utile pour déclarer l'ensemble des fonctions du
 # modèle hors du document principal.
@@ -788,7 +786,7 @@ scatter(t, last.(pos), color=:black, alpha=0.5)
 
 # Attention! Il faut que le code soit inclus au bon endroit (avant que les fonctions déclarées soient appellées).
 
-# include("code/01_test.jl")
+include("code/01_test.jl")
 
 # ## Une autre section
 
