@@ -1,5 +1,5 @@
 # ---
-# title: 21 jours plus tard
+# title: 21 jours plus tard...
 # repository: tpoisot/BIO245-modele
 # auteurs:
 #    - nom: Bhandari
@@ -117,6 +117,7 @@
 
 # La simulation s’arrête soit lorsque tous les agents ont été infectés ou immunisés, soit lorsque le budget est épuisé. Les résultats finaux sont collectés pour comparer
 # la mortalité avec et sans intervention, et pour évaluer l’efficacité et le coût total de la campagne de vaccination.
+
 # # Implémentation : code pour le modèle
 
 # ## Packages nécessaires
@@ -130,9 +131,9 @@ using Random
 
 # ### Initialisation de nombre aléatoire   
 
-# Utilisé seulement pour les figures présentés lors de la présentation orale, pour que les résultats soit reproductibles
+# Utilisé pour les figures présentées lors de la présentation orale, pour que les résultats soit reproductibles
 
-# Random.seed!(2045)
+Random.seed!(2045)
 
 # ### Pour donner un identifiant unique aux agents
 
@@ -291,8 +292,8 @@ ishealthy(agent::Agent) = !isinfectious(agent)
 ## Retour
  True si vacciné
  """
-isvaccinated(agent::Agent) = agent.vaccinated ## État vacciné
-vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous - groupe de la population qui est vacciné
+isvaccinated(agent::Agent) = agent.vaccinated              ## État vacciné
+vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous-groupe de la population qui est vacciné
 
 # ### Vérifier si un agent est testé
 """
@@ -308,7 +309,7 @@ vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous - groupe de l
  """
 istested(agent::Agent) = agent.tested
 
-# Sous groupe de la population qui n'est pas testé et qui est testé 
+# Sous-groupes de la population qui n'est pas testé et qui est testé 
 
 untested(pop::Vector{Agent}) = filter(!istested, pop)
 tested(pop::Vector{Agent}) = filter(istested, pop)
@@ -331,7 +332,7 @@ tested(pop::Vector{Agent}) = filter(istested, pop)
 ispending(agent::Agent) = agent.vaccin_clock
 
 
-# ### Fonction pour prendre uniquement les agents qui sont infectieux dans une population
+# ### Fonction qui prend uniquement les agents qui sont infectés dans une population
 # Pour que ce soit clair, nous allons créer un _alias_, `Population`, qui voudra dire `Vector{Agent}`:
 
 const Population = Vector{Agent}
@@ -380,7 +381,7 @@ healthy(pop::Population) = filter(ishealthy, pop)
  """
 untested(pop::Population) = filter(!istested, pop)
 
-# ### Fonction pour trouver l'ensemble des agents d'une population qui sont dans la même cellule qu'un agent
+# ### Fonction pour trouver les agents d'une population qui sont dans la même cellule qu'un agent infecté
 # Elle va retourner les agents qui ont exactement les mêmes coordonées que l'agent cible (contatcs potentiels).
 # Cela permet d'intégré la propagation spatiale de la pandémie en fonction des contacts directes entre individus, qui sont dans la même case de la lattice
 
@@ -422,7 +423,7 @@ function administrer_vaccin!(agent::Agent)
     return agent
 end
 
-# ### Fonction qui simule les visites à la clinique selon la stratégie de gestion que nous avons adopté 
+# ### Fonction qui simule les visites à la clinique
 
 # Notre stratégie de gestion permet à 1% de la population d'obtenir un rdv en clinique chaques jours, dans le groupe de la population qui n'as 
 # pas été testé. Lors du rendez-vous, on effectue d'abord un test RAT pour déterminer si la personne est saine ou infectée. La simulation prévoit 
@@ -435,11 +436,10 @@ end
 # Le budget est vérifié avant de tester et vacciner. Certains individus de la dernière génération qui avait un rdv seront testés, mais jamais vaccinés. 
 # Le pourcentage d'individus qui ont un rdv en clinique chaques jours est de 1%. Cela représente la capacité d'accueil et de gestion limité d'un village avec 3750 habitants.
 
-
 budget_restant = 21000      ## Au départ, le budget restant est le budget total de 21 000$ 
 cout_vaccin = 17            ## Coût du vaccin
 cout_rat = 4                ## Coût du test RAT 
-pourcent = 0.01             ## Pourcentage de la population qui se présente au rdv en clinique chaques jours 
+pourcent = 0.01             ## Pourcentage de la population qui se présente au rdv en clinique à chaque jour
 
 """
  RDVclinique(arg1, arg2, arg3, arg4, arg5)
@@ -511,7 +511,6 @@ function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent
 end
 
 # # Initialisation de la simulation
-# Paramètes initiaux du modèle
 
 # Population initiale :
 
@@ -532,7 +531,7 @@ function Population(L::Landscape, n::Integer)
     return rand(Agent, L, n)
 end
 
-# Afficher les informations sur la population initiale 
+# Informations sur la population initiale :
 
 Base.show(io::IO, ::MIME"text/plain", p::Population) = print(io, "Une population avec $(length(p)) agents")
 
@@ -544,20 +543,20 @@ population = Population(L, 3750)      ## 3750 étant la taille de la population
 
 rand(population).infectious = true
 
-# Nous initialisons la simulation au temps 0, et nous allons la laisser se dérouler au plus 2000 pas de temps:
+# Nous initialisons la simulation au temps 0 et nous allons la laisser se dérouler au plus 2000 générations :
 
 tick = 0
 maxlength = 2000
 
-# Vecteur pour stocker le nombre de morts à chaques générations d'une simulation
+# Vecteur pour stocker le nombre de morts à chaque génération d'une simulation :
 
 morts = zeros(Int64, maxlength) ;
 
-# Liste des résultats des vecteurs de morts pour les 4 simulations 
+# Liste des résultats des vecteurs de morts pour les 4 simulations :
 
 resultat_morts = Vector{Vector{Int64}}()
 
-# Pour stocker le nombre de test et vaccin a chaques generations 
+# Pour stocker le nombre de test et vaccin à chaque génération :
 
 nb_tests = zeros(Int64, maxlength);     ## objet pour stoker le nombre de tests effectués 
 nb_vaccins = zeros(Int64, maxlength);   ## objet pour stocker le nomre de vaccin 
@@ -565,7 +564,7 @@ nb_vaccins = zeros(Int64, maxlength);   ## objet pour stocker le nomre de vaccin
 # Pour stocker les séries temporelles de la simulation
 S = zeros(Int64, maxlength); ## Série temporelle des agents sains
 I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
-V = zeros(Int64, maxlength); ## Série temporelle des vaccins
+V = zeros(Int64, maxlength); ## Série temporelle des agents vaccinés
 
 # Pour stocker le budget au fil des jours
 
@@ -583,8 +582,7 @@ struct InfectionEvent
     y::Int64
 end
 
-# Liste vide qui va se remplir durant la simulation pour "stocker"
-# Notez que l'on a contraint notre vecteur `events` à ne contenir _que_ des valeurs du bon type, et que nos `InfectionEvent` sont immutables.
+# Liste vide qui va se remplir durant la simulation pour "stocker". Notez que l'on a contraint notre vecteur `events` à ne contenir _que_ des valeurs du bon type, et que nos `InfectionEvent` sont immutables.
 
 events = InfectionEvent[]
 
@@ -594,11 +592,11 @@ events = InfectionEvent[]
 # Lorsqu'il n'y a plus de budget, les efforts de gestion cesse, mais la contamination peut continuer jusqu'à 2000 générations. 
 
 # Pour faire la simulation sans vaccination :  mettre un # devant la ligne _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
-# On fait la simulation 10 fois et on stock les résultats du nombre de morts 
+# . On fait la simulation 10 fois pour évaluer la variabilité et on stock les résultats du nombre de morts.
 
 for _ in 1:10
 
-    ## Paramètres initiaux de la simulation
+    ## Paramètres initiaux 
     population = Population(L, 3750)    ## population initiale de 3750 individus sur le paysage
     rand(population).infectious=true    ## agent choisit au hasard pour être infecté
     tick=0                              ## temps remit à 0
@@ -608,7 +606,7 @@ for _ in 1:10
     nb_vaccins = zeros(Int64, maxlength);   ## objet pour stocker le nomre de vaccin 
     S = zeros(Int64, maxlength);            ## Série temporelle des agents sains
     I = zeros(Int64, maxlength);            ## Série temporelle des agents infectieux 
-    V = zeros(Int64, maxlength);
+    V = zeros(Int64, maxlength);            ## Série temporelle des agents vaccinés
     budget_par_jour = zeros(Int64, maxlength); 
     budget_restant = 21000                  ## Budget restant au debut est le budget total
     
@@ -617,7 +615,7 @@ for _ in 1:10
     tick += 1 ## changement dans les décompte de 1 jours à chaques itération
 
     ## Mettre un # devant la ligne suivante pour faire la simulation sans vaccination 
-    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
+    # budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
 
     ## Mettre à jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours.
     ## Lorsque le décompte de " pending" de 2 jours est passé, l'agent change de statut pour "vacciné""
@@ -663,7 +661,7 @@ for _ in 1:10
         end
     end
 
-    ## Stocker les morts à chaques générations 
+    ## Stocker les morts à chaque génération
     morts[tick] = (tick > 1 ? morts[tick-1] : 0) + count(x -> x.clock <= 0, population)
 
     ## Enlever les morts : on retire ceux qui n'ont plus de jours
@@ -679,12 +677,12 @@ for _ in 1:10
 
     end    
     
-   ## Stocker le nombre de morts à chaques générations pour les 10 simulations 
+   ## Stocker le nombre de morts à chaque génération pour les 10 simulations 
    push!(resultat_morts, morts[1:tick])
 
 end
 
-# Nombre de morts final pour les 10 itérations de simulation
+# Nombre de morts finals pour les 10 itérations de simulation
 
 for (i, morts) in enumerate(resultat_morts)
     println("Sim $i : $(morts[end]) morts en $(length(morts)) jours")
@@ -692,11 +690,14 @@ end
  
 # ## Analyse des résultats
 
-# ### Figure 1
-# Avant toute chose, nous allons couper les séries temporelles au moment de la dernière génération:
+# ### Évolution des agents infectés et sains au cours des générations
+
+# Avant toute chose, nous allons couper les séries temporelles au moment de la dernière génération :
 
 S = S[1:tick];
 I = I[1:tick];
+
+# Et la figure : 
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Population")
@@ -705,35 +706,19 @@ stairs!(ax, 1:tick, I, label="Infectieux", color=:red)
 axislegend(ax)
 current_figure()
 
-# Figure 1. Évolution des agents infectés et sains au cours des générations jusqu’à épuisement des infectés avec vaccination
+# _Figure 1._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés avec vaccination
 
-# Ici, on observe qu’une bonne partie de la population est saine contrairement aux infectés. On observe une diminution rapide de la population et qu’elle se stabilise environ après 400 jours.
+# *Présente dans la présentation orale*
 
-# ### Nombre de cas par individu infectieux
+# Même graphique que la figure 1, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
+# dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
 
-# Nous allons ensuite observer la distribution du nombre de cas créés par chaque individus. Pour ceci, nous devons prendre le contenu de `events`, et vérifier
-# combien de fois chaque individu est représenté dans le champ `from`:
+# _Figure 2._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés sans vaccination
 
-infxn_by_uuid = countmap([event.from for event in events]);
+# Pour la figure 1 et 2, observe qu’une bonne partie de la population est saine contrairement aux infectés. On observe une diminution rapide de la population
+# et qu’elle se stabilise environ après 350 jours. Les infectés ont la même allure.
 
-# La commande `countmap` renvoie un dictionnaire, qui associe chaque UUID au nombre de fois ou il apparait :
-
-# Notez que ceci nous indique combien d'individus ont été infectieux au total :
-
-length(infxn_by_uuid)
-
-# Pour savoir combien de fois chaque nombre d'infections apparaît, il faut utiliser `countmap` une deuxième fois :
-
-nb_inxfn = countmap(values(infxn_by_uuid))
-
-# On peut maintenant visualiser ces données:
-
-f = Figure()
-ax = Axis(f[1, 1]; xlabel="Nombre d'infections", ylabel="Nombre d'agents")
-scatterlines!(ax, [get(nb_inxfn, i, 0) for i in Base.OneTo(maximum(keys(nb_inxfn)))], color=:black)
-f
-
-# ### Nombre de tests et nombre de vaccination par jour au cours du temps 
+# ### Évolution des contraintes budgétaires au cours des générations
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Nombre")
@@ -742,29 +727,26 @@ stairs!(ax, 1:tick, nb_vaccins[1:tick], label="Vaccins", color=:red)
 axislegend(ax)
 current_figure()
 
-# ### Budget restant par jours au cours du temps
+# _Figure 3._ Nombre de tests RAT et de vaccins par au cours des générations 
+
+# Ici, le nombre de vaccins est très faible contrairement au nombre de dépistage. Il y a une très grande augmentation
+# des RAT vers 200 générations et ensuite un déclin. Dans les environ de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
 
 f = Figure()
-ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Budget restant ")
+ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Budget restant")
 stairs!(ax, 1:tick, budget_par_jour[1:tick], color=:black)
 current_figure()
 
-# ### Comparer avec l'absence de de vaccination pour le nombre de infectueux et sain au fil du temps
+# _Figure 4._ Budget restant par jours au cours des générations
 
-# Nous avons désactivé la ligne : "budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)"
-# dans la boucle de la simulation afin d'obtenir un graphique ou il n'y aurait jamais eu d'intervention de dépistage et vaccination 
+# Ici, on observe une diminution exponentielle du budget et forme un plateau vers 1500$.
 
-# ### Comparer avec l'absence de vaccination pour le nombre de personne infecté par agent infectueux 
+# ### Évaluation de la variabilité
 
-# Nous avons désactivé la ligne : "budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)"
-# dans la boucle de la simulation afin d'obtenir un graphique ou il n'y aurait jamais eu d'intervention de dépistage et vaccination 
-
-# ### Nombre de mort pour chaque simulation
-# Graphique qui supperpositionne le nombre de morts a chaques generations pour les 4 simulations
-# Random seed est désactivé pour obersver la variabilité 
+# Graphique qui superpositionne le nombre de morts à chaque génération pour les 4 simulations.
 
 f = Figure()
-ax = Axis(f[1, 1]; xlabel=" jours", ylabel="morts")
+ax = Axis(f[1, 1]; xlabel="Générations", ylabel="Nombre de morts")
 
 for (i, D) in enumerate(resultat_morts)
     lines!(ax, 1:length(D), D, color=:steelblue, alpha=0.4)
@@ -772,6 +754,16 @@ end
 
 current_figure()
 
+# _Figure 5._ Nombre de morts pour chaque simulation avec stratégie de vaccination
+
+# *Présente dans la présentation orale*
+
+# Même graphique que la figure 5, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
+# dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
+
+# ### _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
+
+# Pour les deux figure, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts.
 # # Discussion
 
 # Notre stratégie de vaccination ciblé testait 1% des individus non-testés à chaque jours au test RAT et ceux étant positifs 
@@ -786,9 +778,45 @@ current_figure()
 # agents à un certain diamètre d’un individu ayant testé positif au RAT. Aussi, il aurait aussi intéressant de voir un modèle où 
 # on vaccine le plus de monde possible et voir comment ça évolue, de voir comment l’infection aurait persisté dans le temps.
 
-# ## Résultats
+# ## Comparaison avec / sans campagne
 
-# ## Variabilité
+# Avec la figure 1, il est possible d’observer que la chute importante de la population est dû au temps avant que le vaccin devienne 
+# efficace pour la population. En effet, pour être efficace à grande échelle, ça prend un certain délai avant que le corps développement
+# une réponse immunitaire peu de temps (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
+# l’absence d’infectés. Notre stratégie de vaccination fonctionne à long terme, mais il reste seulement environ 24% de la population
+#  initiale après un peu plus d’un an de simulation.
+
+# Comme il n’a pas de différence majeure entre les résultats obtenus de la figure 1 et 2, on peut remarquer que la stratégie de vaccination 
+# ciblée de cette simulation n'a pas permis de réduire significativement la mortalité ni de modifier la dynamique de transmission de l'épidémie. 
+# La détection aléatoire de 1% des individus non testés par jour est une contrainte majeure, car dans une épidémie, la propagation est rapide et 
+# dépasse largement ce seuil de détection (@benatia2024). Dans les figures, on observe qu’il y a environ 10% d’infectés au pic épidémique, alors ce 
+# 1% de détectés à chaque jours est trop petit pour assurer l’effet voulu de sauver nos individus et d’arrêter la propagation de l’infection.  
+
+# ## Gestion  du budget
+# Avec la figure 3, on observe qu’il y a eu beaucoup plus de dépistages RAT que de vaccins administrés, car la grande majorité du peu de personnes 
+# testées n’était pas malade. Cela explique le faible impact de notre campagne de vaccination. De plus, la campagne de dépistage se poursuit jusqu’à 
+# un peu plus de 600 générations, où il y a un arrêt total de la campagne. Cette figure n’est pas cohérente avec les figures 1 et 2 où la fin des infectés 
+# est vers 350 générations, donc il ne devrait plus avoir de vaccins. Ça peut être expliqué par le faible budget restant, alors il y a encore des dépistages
+# qui se font puisqu’il reste du budget et une erreur au niveau de notre code.
+
+# Avec la figure 4 on voit une stabilisation du budget vers 300 générations à environ 1500$. Cette stabilisation est surement dû au fait que l’épidémie
+# se termine vers 350 générations, alors plus besoin de vacciner les individus. On voit que le budget n’était pas un facteur limitant et que l’on aurait pu 
+# améliorer notre campagne de vaccination en conséquence. Ce changement aurait pu permettre de vacciner plus d’individus, de minimiser les morts, de dépister 
+#plus de 1% de la population ou bien de diminuer le temps de l’épidémie.
+
+# ## Variabilité 
+# Les maladies infectieuses sont un danger pour la population, nous l’avons vu dans cette simulation avec comment un agent infecté à la génération 1 peut causé
+# la mort de plusieurs autres même avec vaccination et diminuer la taille de la population de 76% en environ un an. 
+
+# On remarque qu’avec les 10 simulations avec vaccination, la mortalité moyenne finale est de 2 867 morts (+/- 72) atteinte en moyenne après 473 générations 
+# (+/- 54), laissant environ 883 survivants, soit 24 % de la population initiale. La faible variabilité observée, avec un coefficient de variation d'environ 
+# 2,5 % pour la mortalité et 11 % pour la durée, témoigne d'une forte reproductibilité avec vaccination. La forte reproductibilité peut être dû par 
+
+# En revanche, les 10 essais de la simulation sans vaccination nous avons une mortalité moyenne est de 2 659 morts (+/- 935) atteinte en 400 générations (+/- 139). 
+# Cette variabilité plus élevée est expliquée par une donnée extrême : une simulation où un seul individu est mort en 21 générations. C’est un cas très rare, mais 
+# possible étant donné la grande lattice de 10 000 cases pour 3750 individus. Le cas index, soit premier individu recevant au hasard l’infection à la première génération,
+# peut ne jamais rencontrer d’autres individus susceptibles, donc l’épidémie se termine avec sa mort. Il est possible d’exclure cette donnée extrême et la mortalité moyenne 
+# sans vaccination se rapproche de celle observée avec vaccination, avec environ 796 survivants. Alors, la variabilité entre les simulations devient comparable.
 
 # ## Limites
 
@@ -814,7 +842,14 @@ current_figure()
 # Cela ne représente pas vraiment la réalité, où les individus vont au travail, à l’épicerie, à la maison, etc. Augmentant de beaucoup les 
 # zones où il est possible de transmettre une infection.
 
-# d'autres à venir let me cook
+# Aussi, on prend pour acquis que l’agent positif au RAT post-vaccination qui est en « isolation », pratique les mesures sanitaires comme 
+# le port du masque et la distanciation sociale, les respectes à 100% et cesse de propager le virus. Cette situation est très fictive, car 
+# il est impossible que dans la population tous les individus respectent ces conditions. Aussi, il a été démontré que l’efficacité du port du
+#  masque en conditions réelles est inférieure à son efficacité théorique (@yang2024). Notre modèle surestime l'effet protecteur de l'isolation des agents vaccinés.
+
+# Nous aurions pu aborder pleins d’autres limites comme dans une vraie pandémie, les mesures sont déclenchées plus tard et non après le premier 
+# décès puisque la maladie à ce stade est encore inconnu. Ou bien, que notre vaccin est une antidote et non une protection future, même qu’en 
+# réalité on peut se créer nous même notre propre immunité suite à l’infection.
 
 # Comme la réalité est plus complexe qu’une simulation, c’est normal que la simulation ne prend pas en compte tous ces enjeux. En revanche, 
 # c’est intéressant de voir combien il y a de facteurs pouvant influencer ce modèle.
