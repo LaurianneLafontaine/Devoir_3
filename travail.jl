@@ -600,13 +600,13 @@ for _ in 1:10
     tick=0                              ## temps remit à 0
     morts = zeros(Int64, maxlength)     ## objet pour stocker le nombre de morts 
     
-    nb_tests = zeros(Int64, maxlength);     ## objet pour stoker le nombre de tests effectués 
-    nb_vaccins = zeros(Int64, maxlength);   ## objet pour stocker le nomre de vaccin 
-    S = zeros(Int64, maxlength);            ## Série temporelle des agents sains
-    I = zeros(Int64, maxlength);            ## Série temporelle des agents infectieux 
-    V = zeros(Int64, maxlength);            ## Série temporelle des agents vaccinés
-    budget_par_jour = zeros(Int64, maxlength); 
-    budget_restant = 21000                  ## Budget restant au debut est le budget total
+    nb_tests = zeros(Int64, maxlength);         ## objet pour stoker le nombre de tests effectués 
+    nb_vaccins = zeros(Int64, maxlength);       ## objet pour stocker le nomre de vaccin 
+    S = zeros(Int64, maxlength);                ## Série temporelle des agents sains
+    I = zeros(Int64, maxlength);                ## Série temporelle des agents infectieux 
+    V = zeros(Int64, maxlength);                ## Série temporelle des agents vaccinés
+    budget_par_jour = zeros(Int64, maxlength);  ## Stocker le budget
+    budget_restant = 21000                      ## Budget restant au debut est le budget total
     
     while (length(infectious(population)) != 0) & (tick < maxlength)
 
@@ -706,7 +706,7 @@ current_figure()
 
 # ### _Figure 1._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés avec vaccination
 
-# 'Présente dans la présentation orale'
+# `Présente dans la présentation orale`
 
 # Même graphique que la figure 1, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
 # dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
@@ -714,7 +714,8 @@ current_figure()
 # ### _Figure 2._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés sans vaccination
 
 # Pour la figure 1 et 2, observe qu’une bonne partie de la population est saine contrairement aux infectés. On observe une diminution rapide de la population
-# et qu’elle se stabilise environ après 350 jours. Les infectés ont la même allure.
+# saine après environ 150 jours et qu’elle se stabilise environ après 350 jours. Les courbes indiquant la population infectée ont la même allure sur les deux figures, elles ont un pic à environ 220 jours. 
+# À la fin de l'épidémie, il reste envrion 800 individus pour la figure 1 et 900 pour la figure 2.
 
 # ## Évolution des contraintes budgétaires au cours des générations
 
@@ -725,10 +726,13 @@ stairs!(ax, 1:tick, nb_vaccins[1:tick], label="Vaccins", color=:red)
 axislegend(ax)
 current_figure()
 
+length(vaccinated(population))      ## Nombre d'individus vaccinés
+
 # ### _Figure 3._ Nombre de tests RAT et de vaccins au cours des générations 
 
 # Ici, le nombre de vaccins est très faible contrairement au nombre de dépistage. Il y a une très grande augmentation
-# des RAT vers 200 générations et ensuite un déclin. Dans les environs de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
+# des RAT vers 200 générations et ensuite un déclin. Aussi, il y a une légère augmentation de la vaccination dans le temps.
+# Dans les environs de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Budget restant")
@@ -754,14 +758,15 @@ current_figure()
 
 # ### _Figure 5._ Nombre de morts pour chaque simulation avec stratégie de vaccination
 
-# 'Présente dans la présentation orale'
+# `Présente dans la présentation orale`
 
 # Même graphique que la figure 5, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
 # dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
 
 # ### _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
 
-# Pour les deux figures, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts.
+# Pour les deux figures, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts. La figure 5 possède une moindre variabilité 
+# et la figure 6 possède une certaine variabilité.
 
 # # Discussion
 
@@ -781,9 +786,9 @@ current_figure()
 
 # Avec la figure 1, il est possible d’observer que la chute importante de la population est dû au temps avant que le vaccin devienne 
 # efficace pour la population. En effet, pour être efficace à grande échelle, ça prend un certain délai avant que le corps développe
-# une réponse immunitaire (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
-# l’absence d’infectés. Notre stratégie de vaccination fonctionne à long terme, mais il reste seulement environ 24% de la population
-#  initiale après environ un an de simulation.
+# une réponse immunitaire (@moghadas2021). Ensuite, on peut apercevoir vers 350 jours une stabilisation dans la population et 
+# l’absence d’infectés. Après 300 générations, la population totale a diminué considérablement avec environ 2000 individus sains en moins.
+# Notre stratégie de vaccination fonctionne à long terme, mais il reste seulement environ 24% de la population initiale après environ un an de simulation.
 
 # Comme il n’a pas de différence majeure entre les résultats obtenus de la figure 1 et 2, on peut remarquer que la stratégie de vaccination 
 # ciblée de cette simulation n'a pas permis de réduire significativement la mortalité ni de modifier la dynamique de transmission de l'épidémie. 
@@ -793,12 +798,13 @@ current_figure()
 
 # ## Gestion  du budget
 # Avec la figure 3, on observe qu’il y a eu beaucoup plus de dépistages RAT que de vaccins administrés, car la grande majorité de personnes 
-# testées n’était pas malade. Cela explique le faible impact de notre campagne de vaccination. De plus, la campagne de dépistage se poursuit jusqu’à 
+# testées n’était pas malade. Cela explique le faible impact de notre campagne de vaccination. Aussi, la légère augmentation de la vaccination dans le temps 
+# indique l'augmentation des infectés ayants testés positifs au dépistage. Par contre, seulement 74 personnes ont été vacciné en tout. De plus, la campagne de dépistage se poursuit jusqu’à 
 # un peu plus de 600 générations, où il y a un arrêt total de la campagne. Cette figure n’est pas cohérente avec les figures 1 et 2 où la fin des infectés 
 # est vers 350 générations, donc il ne devrait plus avoir de vaccins. Ça peut être expliqué par le faible budget restant, alors il y a encore des dépistages
 # qui se font puisqu’il reste du budget et une erreur au niveau de notre code.
 
-# Avec la figure 4 on voit une stabilisation du budget vers 300 générations à environ 1500$. Cette stabilisation est sûrement dû au fait que l’épidémie
+# Avec la figure 4, on voit une stabilisation du budget vers 300 générations à environ 1500$. Cette stabilisation est sûrement dû au fait que l’épidémie
 # se termine vers 350 générations, alors on a plus besoin de vacciner les individus. On voit que le budget n’était pas un facteur limitant et que l’on aurait pu 
 # améliorer notre campagne de vaccination en conséquence. Ce changement aurait pu permettre de vacciner plus d’individus, de minimiser les morts, de dépister 
 # plus de 1% de la population ou bien de diminuer le temps de l’épidémie.
@@ -845,7 +851,7 @@ current_figure()
 # centre de dépistage, etc… Il y a d’autres zones géographiques où il y en a moins comme en campagne. Cela joue sur la transmission du 
 # virus (@changruenngam2020). Dans notre simulation, nous avons une lattice avec des agents s’y déplaçant au hasard sans structure. 
 # Cela ne représente pas vraiment la réalité, où les individus vont au travail, à l’épicerie, à la maison, etc. Augmentant de beaucoup les 
-# zones où il est possible de transmettre une infection.
+# zones où il est possible de transmettre une infection. Aussi, l'émigration et immigration peuvent entrer dans cette catégorie.
 
 # Aussi, on prend pour acquis que l’agent positif au RAT post-vaccination qui est en « isolation », pratique les mesures sanitaires comme 
 # le port du masque et la distanciation sociale, les respectes à 100% et cesse de propager le virus. Cette situation est très fictive, car 
