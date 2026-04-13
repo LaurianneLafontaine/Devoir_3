@@ -16,30 +16,16 @@
 #      github: lauriannelafontaine
 # ---
 
-# # Résumé
-
-# Cette étude utilise un modèle de simulation basé sur les agents pour analyser la propagation d’une maladie infectieuse dans un contexte où les ressources
-# de santé sont limitées. Le pathogène simulé est très transmissible, asymptomatique et entraîne la mort en l’absence d’intervention. La transmission se fait
-# par contact direct dans une grille spatiale, où les individus se déplacent de façon aléatoire.
-# Pour représenter des contraintes réalistes du système de santé,
-# seule une petite proportion de la population (1 %) est testée chaque jour, ce qui correspond à une capacité clinique limitée. Les individus sont dépistés à
-# l’aide d’un test rapide imparfait et peuvent être vaccinés s’ils sont détectés comme infectieux, selon le budget disponible. Le vaccin devient pleinement
-# efficace après un court délai, pendant lequel les individus ne participent plus à la transmission.
-# L’objectif est d’évaluer l’effet d’une stratégie de vaccination ciblée sur la mortalité et la propagation de l’épidémie, en tenant compte de contraintes
-# budgétaires et biologiques. Les résultats sont comparés à un scénario sans intervention, et la variabilité entre simulations est analysée. Les résultats
-# montrent que la stratégie réduit la propagation à long terme, mais reste limitée par le dépistage aléatoire, qui ne permet de détecter qu'un faible nombre
-# d'individus infectés, ce qui réduit le nombre de vaccinations effectives.
-
 # # Introduction 
 
 # ## Contexte des maladies infectieuses et importance de la vaccination
 
 # Les maladies infectieuses sont l'une des principales menaces pour la santé publique mondiale . Malgré les progrès significatifs des systèmes de santé,
 # des infections comme la Covid-19 ont montré à quel point ces maladies peuvent se propager rapidement, entraîner l'isolement social et provoquer de nombreux décès.
-# (@cascella2026covid) La transmission de virus par goutelettes, contacte direct ou voyage facilite leur propagation dans une population, et leur nature invisible 
-# rend la prévention difficile sans interventions ciblées. La vaccination est l'une des mesures les plus efficaces pour réduire les risques d'infection et protéger
+# (@cascella2026covid) La transmission de virus par goutelettes, contact direct ou voyage, facilite leur propagation dans une population. Aussi leur nature invisible 
+# rend la prévention difficile sans interventions ciblées. La vaccination est l'une des mesures les plus efficaces pour réduire les risques d'infections et protéger
 # la population. En effet, elle a permis d'éviter plusieurs millions de décès chaque année grâce à la prévention de maladies graves comme la rougeole, le tétanos
-#ou le polio (@ginglen2026immunization).
+# ou le polio (@ginglen2026immunization).
 
 # Dans certaines situations épidémiologiques, les individus infectés peuvent demeurer asympotomatiques tout en étant capables de transmettre la maladie.
 # Cette transmission silencieuse complique l'identification des cas infectieux et limite l'efficacité des approches reposant uniquement sur les symptômes.
@@ -55,19 +41,19 @@
 
 # ## Modélisation épidémiologique
 
-# Afin d'évaluer l'efficacité de différentes stratégies d'intervention, les modèles de simulation, notamment ls modèles agents, sont largement utilisés pour reproduire la
+# Afin d'évaluer l'efficacité de différentes stratégies d'intervention, les modèles de simulation, notamment les modèles d'agents, sont largement utilisés pour reproduire la
 # propagation des maladies infectieuses et teste l'impact combiné du dépistage, de l'isolement et de la vaccination. Ces approches permettent d'explorer différentes allocations
 # de ressources et d'identifier des stratégies optimales de contrôle (@stephenson2020comparing).
 
 # Dans ce travail, nous utilisons un modèle de simulation basé sur les agents pour représenter la propagation d'une maladie infectieuse dans une population qui est initialement
 # saine. Ceci est une approche classique pour étudier la dynamique d'émergence d'un agent pathogène en absence d'immunité préexistante (@keeling2026epidemiologists). 
-# La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et entraîne une mortalité complète en absence d'ntervention. Cela permet de reproduire 
-# les dynamiques observées dans les modèles et agents largement utilisés en épidémiologie (@eubank2004modelling). La présence d'individus asymptomatiques représente également une
+# La maladie simulée possède une transmision par contact direct, une durée d'infection fixe et entraîne la mortalité en absence d'intervention. Cela permet de reproduire 
+# les dynamiques observées dans les modèles d'agents largement utilisés en épidémiologie (@eubank2004modelling). La présence d'individus asymptomatiques représente également une
 # contrainte réaliste, puisque plusieurs études ont démontré que la transmission silencieuse joue un rôle important dans la propagation des infections respiratoires, notamment lors
 # de la pandémie de COVID-19 (@he2020temporal). Dans ce contexte, l'utilisation des tests diagnostiques imparfaits reflète les limites réelles du dépistage, où la sensibilité incomplète
-# de tests influence l'estimation de la prévalence et les décisions d'intervention (@larremore2021test). Un vaccin entièrement efficace est disponible, mais il y a un délai de deux
-# générations (jours) après son administration avant que l'immunité ne soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les
-# ressources peuvent être allouées soit au dépistage par des tests antigéniques rapides, soit à la vaccination des individus.
+# de tests influence l'estimation de la prévalence et les décisions d'intervention (@larremore2021test). Ici, un vaccin entièrement efficace est disponible, mais il y a un délai de deux
+# générations (jours) après son administration avant que l'immunité soit acquise. De plus, la gestion de l'épidémie doit être réalisée sous des contraintes budgétaires, où les
+# ressources peuvent être allouées soit au dépistage par des tests antigéniques rapides (RAT), soit à la vaccination des individus.
 
 # Le problème biologique étudié porte alors sur la dynamique de propagation d’un agent infectieux asymptomatique dans une population naïve, où la transmission silencieuse
 # et les limitations diagnostiques compliquent le contrôle de l’épidémie.
@@ -75,13 +61,14 @@
 # L'objectif de ce travail est donc de développer et d'évaluer une stratégie de vaccination permettant de réduire la mortalité associée à l'épidémie, tout en respectant les contraintes
 # biologiques et budgétaires imposées par le modèle. Nous devons donc (i) mesurer l'efficacité de la campagne, via la réduction de mortalité comparée à l'absence d'intervention, et (ii)
 # estimer le coût total de la campagne. 
+
 # # Présentation du modèle
 
 # ## Contexte épidémiologique simulé
 
 # La simulation modélise la propagation d’une maladie infectieuse très virulente, similaire à Ebola, causant la mort 21 jours après l’infection.
 # La population initiale est entièrement naïve (ne possède aucune immunité) composée de 3750 individus. Un individu est choisi aléatoirement au début de la simulation
-# représentant le premier cas.
+# représentant le premier cas (cas index).
 
 # ## Environnement spatial et déplacement des agents
 
@@ -91,13 +78,13 @@
 # ## Transmission de l'infection
 
 # Les individus infectieux ont une probabilité de 0,4 de transmettre l’infection à leurs voisins dans la même cellule, représentant le contact direct dans la même
-# case de la lattice. La durée de l,infection est fixe et entraîne systématiquement la mort après 21 jours en absence d'intervention.
+# case de la lattice. La durée de l'infection est fixe et entraîne systématiquement la mort après 21 jours en absence d'intervention.
 
 # ## Détection des individus infectieux
 
 # Les individus infectieux sont asymptomatiques et ne peuvent être détectés qu’à partir d’un test antigénique rapide (RAT). Ce test possède une
 # précision de 95 %, ce qui implique un taux de faux négatifs de 5 %, et il ne permet pas de connaître depuis combien de temps un individu est infectieux.
-# Par conséquent, la prévalence réelle de la maladie ne peut donc être estimée que par des résultats de dépistage. 
+# Par conséquent, la prévalence réelle de la maladie ne peut donc pas être estimée que par des résultats de dépistage. 
 
 # ## Contraintes opérationnelles et budgétaires
 
@@ -127,11 +114,12 @@
 # immunisés. Ainsi, ils ne peuvent plus être infectés, transmettre la maladie ni mourir de l’infection.
 
 # Cette stratégie vise à réduire la propagation de l'épidémie en combinant le dépistage d'un sous-ensemble de la population, puis les individus infectés détectés sont pris en
-# charge par vaccination et placés en phase transitoire, ce qui permet de limiter leur conrtibution à la transmission. Cette approche permet d'optimiser l'utilisation du budget
+# charge par vaccination et placés en phase transitoire, ce qui permet de limiter leur contribution à la transmission. Cette approche permet d'optimiser l'utilisation du budget
 # en priorisant les individus identifiés comme infectés via le processus de test.
 
 # L’efficacité de la campagne est ensuite évaluée en comparant la mortalité totale obtenue avec l'intervention à celle observée en absence de contrôle, tout en considérant
 # le coût total engagé pour les tests et la vaccination.
+
 # # Implémentation
 
 # ## Packages nécessaires
@@ -145,8 +133,6 @@ using Random
 
 # ### Initialisation de nombre aléatoire   
 
-# Utilisé pour les figures présentées lors de la présentation orale, pour que les résultats soit reproductibles
-
 Random.seed!(2045)
 
 # ### Pour donner un identifiant unique aux agents
@@ -158,29 +144,26 @@ UUIDs.uuid4()
 
 # ### Type d'agents
 
-# Les agents se déplacent dans un environnement en deux dimension représenté par une lattice, 
-# et on doit donc suivre leur position et leur état : 
+# Les agents se déplacent dans un environnement en deux dimensions représenté par une lattice, où on doit suivre leur position et leur état : 
 # 1) s'ils sont vaccinés, et si l'effet protecteur du vaccin est effectif (soit 2 jours après l'injection).
 # 2) s'ils sont infectieux, et dans ce cas, combien de jours ils leurs restent.
 
 Base.@kwdef mutable struct Agent        ## création de valeurs par défaut pouvant changer pendant la simulation
     x::Int64 = 0
     y::Int64 = 0
-    clock::Int64 = 21                   ## nombre de jours avant la mort si infecté
+    clock::Int64 = 21                   ## Nombre de jours avant la mort si infecté
     infectious::Bool = false            ## Savoir si agent est infectueux 
     vaccin_clock::Int64 = 2             ## Nombre de jour avant l'immunité une fois le vaccin administé
-    vaccinated::Bool = false            ## savoir si agent immunisé par vaccin
-    id::UUIDs.UUID = UUIDs.uuid4()      ## identifiant unique généré automatiquement
+    vaccinated::Bool = false            ## Savoir si agent immunisé par vaccin
+    id::UUIDs.UUID = UUIDs.uuid4()      ## Identifiant unique généré automatiquement
     tested::Bool = false                ## Savoir si agent est testé 
     pending::Bool = false               ## Savoir si l'agent est en attente de l'efficacité du vaccin, et en isolation
 end
 
 # ### Type paysage
 
-# Définit les limites de la grille où les agents se déplacent Ici, c'est une
-# grille de -50 à 50 dans les deux directions, donc 100x100 = 10 000 cases au
-# total. Les agents qui se trouvent dans la même cases sont considérés très
-# proches, donc en contact direct et à risque de contamination. 
+# Définit les limites de la grille où les agents se déplacent Ici, c'est une grille de -50 à 50 dans les deux directions, donc 100x100 = 10 000 cases au
+# total. Les agents qui se trouvent dans la même cases sont considérés très proches, donc en contact direct et à risque de contamination. 
 
 Base.@kwdef mutable struct Landscape
     xmin::Int64 = -25
@@ -189,7 +172,7 @@ Base.@kwdef mutable struct Landscape
     ymax::Int64 = 25
 end
 
-# Nous allons maintenant créer un paysage de départ :
+# Créer un paysage de départ :
 
 L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 
@@ -197,8 +180,7 @@ L = Landscape(xmin=-50, xmax=50, ymin=-50, ymax=50)
 
 # ### Création d'agents aléatoires
 
-# On génère une fonction pour créer des agents au hasard. Il
-# existe une fonction pour faire ceci dans _Julia_: `rand`. Pour que notre code
+# On génère une fonction pour créer des agents au hasard. Il existe une fonction pour faire ceci dans _Julia_: `rand`. Pour que notre code
 # soit facile a comprendre, nous allons donc ajouter une méthode à cette fonction:
 
 """
@@ -227,7 +209,7 @@ Random.rand(::Type{Agent}, L::Landscape, n::Int64) = [rand(Agent, L) for _ in 1:
 
 # ### Fonction du déplacement des agents dans le paysage
 
-# Puisque la position de l'agent va changer, notre fonction se termine par `!`:
+# Puisque la position de l'agent va changer, notre fonction se termine par `!`.
 # La lattice est de type torus. Ainsi, si un agent atteint la limite de la lattice, il réapparait de l'autre côté.
 # Les déplacements sont aléatoires et peuvent être de -1, 0 ou 1 sur l'axe des x entraîne y.  
 """
@@ -323,13 +305,13 @@ vaccinated(pop::Vector{Agent}) = filter(isvaccinated, pop) ## Sous-groupe de la 
  """
 istested(agent::Agent) = agent.tested
 
-# Sous-groupes de la population qui n'est pas testé et qui est testé 
+# Sous-groupes de la population qui ne sont pas testés et qui sont testés 
 
 untested(pop::Vector{Agent}) = filter(!istested, pop)
 tested(pop::Vector{Agent}) = filter(istested, pop)
 
 # ### Vérifier si un agent est en attente de l'efficacité du vaccin 
-# Après avoir été en contact avec le pathogène dans le vaccin, le corps prend un délais de 2 jours pour développer l'immunité
+# Après avoir été en contact avec le pathogène dans le vaccin, le corps prend un délais de 2 jours pour développer l'immunité.
 
 """
  ispending(arg1)
@@ -396,7 +378,7 @@ healthy(pop::Population) = filter(ishealthy, pop)
 untested(pop::Population) = filter(!istested, pop)
 
 # ### Fonction pour trouver les agents d'une population qui sont dans la même cellule qu'un agent infecté
-# Elle va retourner les agents qui ont exactement les mêmes coordonées que l'agent cible (contatcs potentiels).
+# Elle va retourner les agents qui ont exactement les mêmes coordonées que l'agent cible (contacts potentiels).
 # Cela permet d'intégré la propagation spatiale de la pandémie en fonction des contacts directes entre individus, qui sont dans la même case de la lattice
 
 """
@@ -439,12 +421,12 @@ end
 
 # ### Fonction qui simule les visites à la clinique
 
-# Notre stratégie de gestion permet à 1% de la population d'obtenir un rdv en clinique chaques jours, dans le groupe de la population qui n'as 
+# Notre stratégie de gestion permet à 1% de la population d'obtenir un rdv en clinique chaques jours, dans le groupe de la population qui n'a 
 # pas été testé. Lors du rendez-vous, on effectue d'abord un test RAT pour déterminer si la personne est saine ou infectée. La simulation prévoit 
 # un taux de faux négatifs de 5% lors du test RAT. Si la personne est infectée, on lui administre le vaccin directement et la place en isolation pendant 2 jours.
 # Le vaccin est une antidote, donc il va sauver l'agent de l'infection. 
 
-# Contraintes budégtaires
+# Contraintes budgétaires
 
 # Lorsque le budget est dépassé, on ne peut plus tester ou vacciner les agens qui sont présentement dans leur visite à la clinique.
 # Le budget est vérifié avant de tester et vacciner. Certains individus de la dernière génération qui avait un rdv seront testés, mais jamais vaccinés. 
@@ -501,7 +483,7 @@ function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent
         end
 
         ## Vaccination des agents testés malade lors du RDV 
-        ## En raison des faux negatifs, ce ne sont pas tous les agents infectés qui sont détectés
+        ## En raison des faux négatifs, ce ne sont pas tous les agents infectés qui sont détectés
         num_to_vaccinate = length(infectueux_detecte) ## Nombre d'agents qui ont été testés et qui sont malades. Ce sont ceux qui seront vaccinés le jour même
 
         ## Vérifier si le budget restant couvre les coûts pour vacciner tous les agents qui ont testé infecté lors du RDV  
@@ -512,11 +494,12 @@ function RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent
         ## Mettre à jour le budget restant après le coût des vaccins du jour
         budget_restant -= num_to_vaccinate * cout_vaccin
 
-        ## Vacciner les agents qui ont été testés malade lors du RDV et les mettre en "isolation" pendant 2 jour 
-        ## L'isolation est représentée par le statut "ispending" qui est également la période d'attente de l'efficacité du vaccin
+        ## Vacciner les agents qui ont testé malade lors du RDV et les mettre en "isolation" pendant 2 jour. 
+        ## L'isolation est représentée par le statut "ispending" qui est également la période d'attente de l'efficacité du vaccin.
+        ## Les agents en isolation restent en mouvement dans la lattice, mais on considère qu'ils respectent des mesures de distanciation sociale et le port du masque.
         for agent in infectueux_detecte[1:num_to_vaccinate]
             if agent.infectious
-                administrer_vaccin!(agent) ## Applique le vacin et débute le clock de 2 jours avant l'immunité 
+                administrer_vaccin!(agent) ## Applique le vaccin et débute le clock de 2 jours avant l'immunité 
                 agent.pending = true ## Le statut de l'agent qui vient d'être vacciné change pour "pending" (2 jour avant l'immunité)
             end
         end
@@ -538,7 +521,7 @@ end
  arg2 : Nombre d'agents souhaités dans la population
 
 ## Retour
-Retourne une population avec un nombre d'agent distribués aléatoirement dans le paysage  
+Retourne une population avec un nombre d'agent distribué aléatoirement dans le paysage  
 
 """
 function Population(L::Landscape, n::Integer)
@@ -557,7 +540,7 @@ population = Population(L, 3750)      ## 3750 étant la taille de la population
 
 rand(population).infectious = true
 
-# Nous initialisons la simulation au temps 0 et nous allons la laisser se dérouler au plus 2000 générations :
+# Nous initialisons la simulation au temps 0 et nous allons la laisser se dérouler au plus 2000 générations (chiffre fictif grand pour laisser la simulation rouler sans contrainte):
 
 tick = 0
 maxlength = 2000
@@ -570,12 +553,13 @@ morts = zeros(Int64, maxlength) ;
 
 resultat_morts = Vector{Vector{Int64}}()
 
-# Pour stocker le nombre de test et vaccin à chaque génération :
+# Objets pour stocker le nombre de tests et vaccins à chaque génération respectivement :
 
-nb_tests = zeros(Int64, maxlength);     ## objet pour stoker le nombre de tests effectués 
-nb_vaccins = zeros(Int64, maxlength);   ## objet pour stocker le nomre de vaccin 
+nb_tests = zeros(Int64, maxlength); 
+nb_vaccins = zeros(Int64, maxlength);
 
 # Pour stocker les séries temporelles de la simulation
+
 S = zeros(Int64, maxlength); ## Série temporelle des agents sains
 I = zeros(Int64, maxlength); ## Série temporelle des agents infectieux 
 V = zeros(Int64, maxlength); ## Série temporelle des agents vaccinés
@@ -602,7 +586,7 @@ events = InfectionEvent[]
 
 # # Simulation 
 
-# La boucle tourne tant qu'il y a des infectés et que le temps maximale n'est pas atteint. 
+# La boucle tourne tant qu'il y a d'infectés et que le temps maximale n'est pas atteint. 
 # Lorsqu'il n'y a plus de budget, les efforts de gestion cesse, mais la contamination peut continuer jusqu'à 2000 générations. 
 
 # Pour faire la simulation sans vaccination :  mettre un # devant la ligne _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
@@ -629,10 +613,10 @@ for _ in 1:10
     tick += 1 ## changement dans les décompte de 1 jours à chaques itération
 
     ## Mettre un # devant la ligne suivante pour faire la simulation sans vaccination 
-    # budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
+    budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent) ## Résultat du budget restant selon ce les rdv de la journée
 
-    ## Mettre à jour le statut des agents qui sont en attente de l'efficacité du vaccin et l'isolation de 2 jours.
-    ## Lorsque le décompte de " pending" de 2 jours est passé, l'agent change de statut pour "vacciné""
+    ## Mettre à jour le statut des agents qui sont en attente de l'efficacité du vaccin et de l'isolation de 2 jours.
+    ## Lorsque le décompte de "pending" de 2 jours est passé, l'agent change de statut pour "vacciné"
     ## Les agents vaccinés ne sont plus malades et ne transmettent pas l'infection.
 
     for agent in population
@@ -650,7 +634,7 @@ for _ in 1:10
     end
 
     ## Mouvement : les agents bougent d'une case à chaque génération. 
-    ## Les agents qui sont en isolation bougent quand même, mais on considère qu'ils font des mesures sanitaires (ex : port du masque)
+    ## Les agents qui sont en isolation bougent quand même, mais on considère qu'ils respectent des mesures sanitaires (ex : port du masque).
 
     for agent in population
         move!(agent, L; torus= true)
@@ -702,9 +686,9 @@ for (i, morts) in enumerate(resultat_morts)
     println("Sim $i : $(morts[end]) morts en $(length(morts)) jours")
 end
  
-# ## Analyse des résultats
+# # Analyse des résultats
 
-# ### Évolution des agents infectés et sains au cours des générations
+# ## Évolution des agents infectés et sains au cours des générations
 
 # Avant toute chose, nous allons couper les séries temporelles au moment de la dernière génération :
 
@@ -720,19 +704,19 @@ stairs!(ax, 1:tick, I, label="Infectieux", color=:red)
 axislegend(ax)
 current_figure()
 
-# _Figure 1._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés avec vaccination
+# ### _Figure 1._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés avec vaccination
 
-# *Présente dans la présentation orale*
+# 'Présente dans la présentation orale'
 
 # Même graphique que la figure 1, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
 # dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
 
-# _Figure 2._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés sans vaccination
+# ### _Figure 2._ Évolution des agents infectés et sains (suspectibles) au cours des générations jusqu’à épuisement des infectés sans vaccination
 
 # Pour la figure 1 et 2, observe qu’une bonne partie de la population est saine contrairement aux infectés. On observe une diminution rapide de la population
 # et qu’elle se stabilise environ après 350 jours. Les infectés ont la même allure.
 
-# ### Évolution des contraintes budgétaires au cours des générations
+# ## Évolution des contraintes budgétaires au cours des générations
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Nombre")
@@ -741,21 +725,21 @@ stairs!(ax, 1:tick, nb_vaccins[1:tick], label="Vaccins", color=:red)
 axislegend(ax)
 current_figure()
 
-# _Figure 3._ Nombre de tests RAT et de vaccins au cours des générations 
+# ### _Figure 3._ Nombre de tests RAT et de vaccins au cours des générations 
 
 # Ici, le nombre de vaccins est très faible contrairement au nombre de dépistage. Il y a une très grande augmentation
-# des RAT vers 200 générations et ensuite un déclin. Dans les environ de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
+# des RAT vers 200 générations et ensuite un déclin. Dans les environs de 600 générations, on voit qu’il n’y a plus de tests RAT ni de vaccins.
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="Génération", ylabel="Budget restant")
 stairs!(ax, 1:tick, budget_par_jour[1:tick], color=:black)
 current_figure()
 
-# _Figure 4._ Budget restant par jours au cours des générations
+# ### _Figure 4._ Budget restant par jours au cours des générations
 
-# Ici, on observe une diminution exponentielle du budget et forme un plateau vers 1500$.
+# Ici, on observe une diminution exponentielle du budget et la formation d'un plateau vers 1500$.
 
-# ### Évaluation de la variabilité
+# ## Évaluation de la variabilité
 
 # Graphique qui superpositionne le nombre de morts à chaque génération pour les 4 simulations.
 
@@ -768,16 +752,17 @@ end
 
 current_figure()
 
-# _Figure 5._ Nombre de morts pour chaque simulation avec stratégie de vaccination
+# ### _Figure 5._ Nombre de morts pour chaque simulation avec stratégie de vaccination
 
-# *Présente dans la présentation orale*
+# 'Présente dans la présentation orale'
 
 # Même graphique que la figure 5, sauf que le code a été effectué en désactivant la ligne : _budget_restant = RDVclinique(population, budget_restant, cout_rat, cout_vaccin, pourcent)_
 # dans la boucle de la simulation pour obtenir un graphique où il n'y aurait jamais eu d'intervention de stratégie de vaccination et dépistage. 
 
-#  _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
+# ### _Figure 6._ Nombre de morts pour chaque simulation sans stratégie de vaccination
 
 # Pour les deux figures, les courbes du taux de mortalité sont sigmoïdes avec un plateau vers 2700 et 3000 morts.
+
 # # Discussion
 
 # Notre stratégie de vaccination ciblée testait 1% des individus non-testés à chaque jours au test RAT et ceux étant positifs 
@@ -792,13 +777,13 @@ current_figure()
 # agents à un certain diamètre d’un individu ayant testé positif au RAT. Aussi, il aurait aussi été intéressant de voir un modèle où 
 # on vaccine le plus de monde possible et voir comment ça évolue, de voir comment l’infection aurait persisté dans le temps.
 
-# ## Comparaison avec / sans campagne
+# ## Comparaison avec / sans campagne de vaccination
 
 # Avec la figure 1, il est possible d’observer que la chute importante de la population est dû au temps avant que le vaccin devienne 
 # efficace pour la population. En effet, pour être efficace à grande échelle, ça prend un certain délai avant que le corps développe
-# une réponse immunitaire en peu de temps (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
+# une réponse immunitaire (@moghadas2021). Ensuite, on peut apercevoir vers 400 jours une stabilisation dans la population et 
 # l’absence d’infectés. Notre stratégie de vaccination fonctionne à long terme, mais il reste seulement environ 24% de la population
-#  initiale après un peu plus d’un an de simulation.
+#  initiale après environ un an de simulation.
 
 # Comme il n’a pas de différence majeure entre les résultats obtenus de la figure 1 et 2, on peut remarquer que la stratégie de vaccination 
 # ciblée de cette simulation n'a pas permis de réduire significativement la mortalité ni de modifier la dynamique de transmission de l'épidémie. 
@@ -824,11 +809,11 @@ current_figure()
 
 # On remarque qu’avec les 10 simulations avec vaccination, la mortalité moyenne finale est de 2 867 morts (+/- 72) atteinte en moyenne après 473 générations 
 # (+/- 54), laissant environ 883 survivants, soit 24 % de la population initiale. La faible variabilité observée, avec un coefficient de variation d'environ 
-# 2,5 % pour la mortalité et 11 % pour la durée, témoigne d'une forte reproductibilité avec vaccination. La forte reproductibilité peut être dû par...
+# 2,5 % pour la mortalité et 11 % pour la durée, témoigne d'une forte reproductibilité avec vaccination.
 # Cette faible variabilité peut s'expliquer par la contrainte du dépistage systématique et de la vaccination ciblée, qui stabilise rapidement la dynamique
 # épidémique en réduisant les fluctuations aléatoires de transmission.
 
-# En revanche, après les 10 essais de la simulation sans vaccination nous avons une mortalité moyenne est de 2 659 morts (+/- 935) atteinte en 400 générations (+/- 139). 
+# En revanche, après les 10 essais de la simulation sans vaccination, nous avons une mortalité moyenne est de 2 659 morts (+/- 935) atteinte en 400 générations (+/- 139). 
 # Cette variabilité plus élevée est expliquée par une donnée extrême : une simulation où un seul individu est mort en 21 générations. C’est un cas très rare, mais 
 # possible étant donné la grande lattice de 10 000 cases pour 3750 individus. Le cas index, soit le premier individu recevant au hasard l’infection à la première génération,
 # peut ne jamais rencontrer d’autres individus susceptibles, donc l’épidémie se termine avec sa mort. De plus, la nature stochastique des contacts dans le modèle agent-basé
@@ -846,7 +831,7 @@ current_figure()
 # entre 70 % et 90 % chez les agents symptomatiques, mais diminue à moins de 50 % chez les asymptomatiques (@fouzas2021). Dans 
 # notre simulation notre 5% de faux négatifs est considéré bon contrairement à celui présenté précédemment, voir un peu trop irréaliste.
 
-# Pour la prévention, les vaccins sont 100% efficaces, seulement après 2 jours. Dans cette simulation c’est très utile, mais ce n'est pas très 
+# Pour la prévention, les vaccins sont 100% efficaces seulement après 2 jours. Dans cette simulation c’est très utile, mais ce n'est pas très 
 # réaliste de la vraie vie, où le système immunitaire des individus varie. Par exemple, avec les vaccins contre la Covid-19, l’efficacité
 # variait entre 50-100% selon la variante du vaccin et du virus (@higdon2022). Aussi, avec l’Ebola, l’immunisation était significative 
 # qu’après 10 jours ou plus (@henao2017).
@@ -868,7 +853,7 @@ current_figure()
 #  masque en conditions réelles est inférieure à son efficacité théorique (@yang2024). Notre modèle surestime l'effet protecteur de l'isolation des agents vaccinés.
 
 # Nous aurions pu aborder pleins d’autres limites comme dans une vraie pandémie où les mesures sont déclenchées plus tard et non après le premier 
-# décès puisque la maladie à ce stade est encore inconnue. Ou bien, que notre vaccin est une antidote et non une protection future, même qu’en 
+# décès puisque la maladie à ce stade est encore inconnue. Ou bien, que notre vaccin est une antidote et non une prévention, même qu’en 
 # réalité on peut se créer nous même notre propre immunité suite à l’infection.
 
 # Comme la réalité est plus complexe qu’une simulation, c’est normal que la simulation ne prend pas en compte tous ces enjeux. En revanche, 
